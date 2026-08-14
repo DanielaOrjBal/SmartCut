@@ -1,0 +1,13 @@
+{
+    "id": "san-mateo-information",
+    "title": "Conoce San Mateo",
+    "url": "https://www.sanmateo.edu.co/",
+    "allowedDomains": [
+        "www.sanmateo.edu.co",
+        "sanmateo.edu.co"
+    ],
+    "showBackButton": true,
+    "openExternalLinks": false,
+    "loadingMessage": "Cargando información institucional...",
+    "errorMessage": "No fue posible cargar la información. Verifica tu conexión."
+}

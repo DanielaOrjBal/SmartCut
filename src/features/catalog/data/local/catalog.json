@@ -1,0 +1,46 @@
+[
+    {
+        "id": "p-001",
+        "name": "Agenda San Mateo 2026",
+        "category": "Papelería",
+        "price": 28000,
+        "currency": "COP",
+        "stock": 18,
+        "imageKey": "agenda-san-mateo",
+        "shortDescription": "Agenda académica de tapa dura.",
+        "description": "Agenda semanal pensada para organizar clases, metas y entregas.",
+        "features": [
+            "Vista semanal",
+            "Tapa dura",
+            "Separadores mensuales"
+        ],
+        "specifications": {
+            "material": "Papel reciclado",
+            "pages": 160,
+            "size": "A5"
+        },
+        "isFeatured": true,
+        "isAvailable": true
+    },
+    {
+        "id": "p-002",
+        "name": "Termo San Mateo",
+        "category": "Accesorios",
+        "price": 45000,
+        "currency": "COP",
+        "stock": 9,
+        "imageKey": "termo-san-mateo",
+        "shortDescription": "Termo metálico de 500 ml.",
+        "description": "Conserva bebidas frías o calientes.",
+        "features": [
+            "500 ml",
+            "Tapa hermética"
+        ],
+        "specifications": {
+            "material": "Acero inoxidable",
+            "capacityMl": 500
+        },
+        "isFeatured": false,
+        "isAvailable": true
+    }
+]

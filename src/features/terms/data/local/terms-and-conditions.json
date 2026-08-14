@@ -1,0 +1,23 @@
+{
+    "version": "1.0",
+    "lastUpdated": "2026-08-11",
+    "title": "Términos y condiciones de uso",
+    "intro": "Este contenido es académico y hace parte del proyecto San Mateo.",
+    "sections": [
+        {
+            "id": "use",
+            "title": "Uso académico",
+            "content": "La aplicación se utiliza únicamente con fines formativos."
+        },
+        {
+            "id": "privacy",
+            "title": "Datos de prueba",
+            "content": "Los usuarios y productos son ficticios; no ingrese información personal real."
+        },
+        {
+            "id": "acceptance",
+            "title": "Aceptación",
+            "content": "Al continuar, el usuario reconoce el propósito académico de la aplicación."
+        }
+    ]
+}

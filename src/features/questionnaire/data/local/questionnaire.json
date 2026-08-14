@@ -1,0 +1,61 @@
+{
+    "id": "product-experience",
+    "title": "Cuéntanos tu experiencia",
+    "description": "Formulario de práctica para crear campos dinámicos.",
+    "submitLabel": "Enviar respuestas",
+    "fields": [
+        {
+            "id": "fullName",
+            "type": "text",
+            "label": "Nombre completo",
+            "placeholder": "Escribe tu nombre",
+            "required": true,
+            "minLength": 3
+        },
+        {
+            "id": "email",
+            "type": "email",
+            "label": "Correo",
+            "placeholder": "correo@ejemplo.com",
+            "required": true
+        },
+        {
+            "id": "rating",
+            "type": "select",
+            "label": "¿Cómo calificas el producto?",
+            "required": true,
+            "options": [
+                {
+                    "label": "Excelente",
+                    "value": "5"
+                },
+                {
+                    "label": "Bueno",
+                    "value": "4"
+                },
+                {
+                    "label": "Regular",
+                    "value": "3"
+                },
+                {
+                    "label": "Por mejorar",
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "id": "recommend",
+            "type": "boolean",
+            "label": "¿Lo recomendarías?",
+            "required": false
+        },
+        {
+            "id": "comments",
+            "type": "textarea",
+            "label": "Comentarios",
+            "placeholder": "Escribe una sugerencia",
+            "required": false,
+            "maxLength": 300
+        }
+    ]
+}
