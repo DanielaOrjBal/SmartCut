@@ -1,0 +1,61 @@
+{
+    "id": "smartcut-experience",
+    "title": "Cuéntanos tu experiencia con SmartCut",
+    "description": "Formulario académico para conocer la experiencia de los usuarios con SmartCut.",
+    "submitLabel": "Enviar respuestas",
+    "fields": [
+        {
+            "id": "userName",
+            "type": "text",
+            "label": "Nombre",
+            "placeholder": "Escribe un nombre de prueba",
+            "required": true,
+            "minLength": 3
+        },
+        {
+            "id": "email",
+            "type": "email",
+            "label": "Correo",
+            "placeholder": "correo@ejemplo.com",
+            "required": true
+        },
+        {
+            "id": "easeOfUse",
+            "type": "select",
+            "label": "¿Qué tan fácil fue utilizar SmartCut?",
+            "required": true,
+            "options": [
+                {
+                    "label": "Muy fácil",
+                    "value": "5"
+                },
+                {
+                    "label": "Fácil",
+                    "value": "4"
+                },
+                {
+                    "label": "Regular",
+                    "value": "3"
+                },
+                {
+                    "label": "Difícil",
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "id": "recommend",
+            "type": "boolean",
+            "label": "¿Recomendarías SmartCut?",
+            "required": false
+        },
+        {
+            "id": "comments",
+            "type": "textarea",
+            "label": "Comentarios sobre SmartCut",
+            "placeholder": "Escribe una sugerencia",
+            "required": false,
+            "maxLength": 300
+        }
+    ]
+}

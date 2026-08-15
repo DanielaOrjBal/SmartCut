@@ -1,0 +1,19 @@
+
+[
+    {
+        "id": "u-001",
+        "name": "Usuario Administrador",
+        "email": "admin@smartcut.example",
+        "password": "adm123",
+        "role": "admin",
+        "isActive": true
+    },
+    {
+        "id": "u-002",
+        "name": "Barbero de Prueba",
+        "email": "barbero@smartcut.example",
+        "password": "brb123",
+        "role": "barber",
+        "isActive": true
+    }
+]

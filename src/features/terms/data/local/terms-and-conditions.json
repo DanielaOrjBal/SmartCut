@@ -1,0 +1,23 @@
+{
+    "version": "1.0",
+    "lastUpdated": "2026-08-14",
+    "title": "Términos y condiciones de SmartCut",
+    "intro": "Estos términos hacen parte del proyecto académico SmartCut para la gestión de barberías.",
+    "sections": [
+        {
+            "id": "academic-use",
+            "title": "Uso académico",
+            "content": "SmartCut es desarrollado con fines académicos para apoyar la gestión de información y procesos relacionados con barberías."
+        },
+        {
+            "id": "test-data",
+            "title": "Datos de prueba",
+            "content": "Los usuarios, productos y demás información utilizada en esta aplicación son datos ficticios empleados únicamente para pruebas académicas."
+        },
+        {
+            "id": "responsible-use",
+            "title": "Uso responsable",
+            "content": "La información registrada en SmartCut debe utilizarse de manera responsable y únicamente dentro del contexto establecido para el proyecto."
+        }
+    ]
+}

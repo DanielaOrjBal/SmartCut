@@ -1,0 +1,71 @@
+[
+    {
+        "id": "p-001",
+        "name": "Máquina de corte profesional",
+        "category": "Herramientas",
+        "price": 180000,
+        "currency": "COP",
+        "stock": 8,
+        "imageKey": "maquina-corte",
+        "shortDescription": "Máquina profesional para cortes de precisión.",
+        "description": "Máquina de corte diseñada para trabajos de barbería y uso profesional.",
+        "features": [
+            "Motor de alto rendimiento",
+            "Cuchillas de precisión",
+            "Uso inalámbrico"
+        ],
+        "specifications": {
+            "material": "Acero inoxidable y ABS",
+            "batteryHours": 3,
+            "weightGrams": 350
+        },
+        "isFeatured": true,
+        "isAvailable": true
+    },
+    {
+        "id": "p-002",
+        "name": "Cera capilar mate",
+        "category": "Cuidado capilar",
+        "price": 35000,
+        "currency": "COP",
+        "stock": 15,
+        "imageKey": "cera-capilar",
+        "shortDescription": "Cera de fijación media con acabado mate.",
+        "description": "Producto para peinar y mantener diferentes estilos de cabello durante la jornada.",
+        "features": [
+            "Acabado mate",
+            "Fijación media",
+            "Fácil de retirar"
+        ],
+        "specifications": {
+            "presentationGrams": 100,
+            "finish": "Mate",
+            "fixation": "Media"
+        },
+        "isFeatured": false,
+        "isAvailable": true
+    },
+    {
+        "id": "p-003",
+        "name": "Aceite para barba",
+        "category": "Cuidado de barba",
+        "price": 28000,
+        "currency": "COP",
+        "stock": 12,
+        "imageKey": "aceite-barba",
+        "shortDescription": "Aceite para hidratar y acondicionar la barba.",
+        "description": "Aceite diseñado para mantener la barba hidratada, suave y con una apariencia cuidada.",
+        "features": [
+            "Hidratación",
+            "Suaviza la barba",
+            "Fácil aplicación"
+        ],
+        "specifications": {
+            "presentationMl": 30,
+            "application": "Tópica",
+            "finish": "Natural"
+        },
+        "isFeatured": false,
+        "isAvailable": true
+    }
+]
