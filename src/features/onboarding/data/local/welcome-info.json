@@ -1,0 +1,25 @@
+{
+  "id": "welcome-screen",
+  "step": "1 / 6",
+  "title": "Bienvenido a SmartCut",
+  "subtitle": "Tu barbería al día con la mejor economía.",
+  "description": "Configuremos tu barbería para que puedas comenzar a administrar tu negocio.",
+  "features": [
+    {
+      "id": "f-1",
+      "icon": "trending-up",
+      "text": "Controla ingresos y ganancias"
+    },
+    {
+      "id": "f-2",
+      "icon": "bar-chart-2",
+      "text": "Analiza el rendimiento de tu equipo"
+    },
+    {
+      "id": "f-3",
+      "icon": "calendar",
+      "text": "Gestiona turnos eficientemente"
+    }
+  ],
+  "buttonText": "Comenzar"
+}
