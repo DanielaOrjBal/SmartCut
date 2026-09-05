@@ -1,0 +1,148 @@
+import { StyleSheet, Platform } from 'react-native';
+
+export const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
+    paddingTop: Platform.OS === 'android' ? 25 : 0,
+  },
+  scrollContainer: {
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  headerLogo: {
+    width: 30,
+    height: 40,
+  },
+  stepText: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '500',
+    letterSpacing: 1,
+  },
+  progressBarContainer: {
+    flexDirection: 'row',
+    height: 3,
+    width: '100%',
+    marginBottom: 24,
+  },
+  progressBarActive: {
+    flex: 0.33,
+    backgroundColor: '#C49A45',
+    borderTopLeftRadius: 2,
+    borderBottomLeftRadius: 2,
+  },
+  progressBarInactive: {
+    flex: 0.67,
+    backgroundColor: '#E5E7EB',
+    borderTopRightRadius: 2,
+    borderBottomRightRadius: 2,
+  },
+  titleContainer: {
+    marginBottom: 24,
+  },
+  stepIndicator: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#0284C7',
+    marginBottom: 6,
+    letterSpacing: 0.5,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#0A192F',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    lineHeight: 20,
+  },
+  formContainer: {
+    width: '100%',
+    marginBottom: 30,
+  },
+  label: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#9CA3AF',
+    marginBottom: 8,
+    letterSpacing: 0.5,
+  },
+  input: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 15,
+    color: '#1F2937',
+    marginBottom: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.02,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  mapBox: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingVertical: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 18,
+    borderStyle: 'dashed',
+  },
+  mapIconPlaceholder: {
+    marginBottom: 6,
+  },
+  mapIconText: {
+    fontSize: 22,
+  },
+  mapBoxText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#4B5563',
+  },
+  footer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  button: {
+    backgroundColor: '#C49A45',
+    width: '100%',
+    paddingVertical: 18,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#C49A45',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
+    marginBottom: 16,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  skipButton: {
+    paddingVertical: 8,
+  },
+  skipButtonText: {
+    color: '#6B7280',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+});
