@@ -1,6 +1,6 @@
-import { useCallback, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { SplashScreen } from "../features/splash/presentation/screens/SplashScreen";
+import { useCallback, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { SplashScreen } from '../features/splash/presentation/screens/SplashScreen';
 
 export function AppContent() {
   const [isSplashVisible, setIsSplashVisible] = useState(true);
@@ -15,8 +15,7 @@ export function AppContent() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        Muchachos me deben un helado JAJAJAJ</Text>
+      <Text style={styles.title}>Aquí iniciaremos la autenticación</Text>
     </View>
   );
 }
@@ -24,11 +23,15 @@ export function AppContent() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#FFFDF9',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#3A2E2B',
+    textAlign: 'center'
+  }
 });

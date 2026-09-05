@@ -1,23 +1,23 @@
 {
     "version": "1.0",
-    "lastUpdated": "2026-08-11",
-    "title": "Términos y condiciones de uso",
-    "intro": "Este contenido es académico y hace parte del proyecto San Mateo.",
+    "lastUpdated": "2026-08-14",
+    "title": "Términos y condiciones de SmartCut",
+    "intro": "Estos términos hacen parte del proyecto académico SmartCut para la gestión de barberías.",
     "sections": [
         {
-            "id": "use",
+            "id": "academic-use",
             "title": "Uso académico",
-            "content": "La aplicación se utiliza únicamente con fines formativos."
+            "content": "SmartCut es desarrollado con fines académicos para apoyar la gestión de información y procesos relacionados con barberías."
         },
         {
-            "id": "privacy",
+            "id": "test-data",
             "title": "Datos de prueba",
-            "content": "Los usuarios y productos son ficticios; no ingrese información personal real."
+            "content": "Los usuarios, productos y demás información utilizada en esta aplicación son datos ficticios empleados únicamente para pruebas académicas."
         },
         {
-            "id": "acceptance",
-            "title": "Aceptación",
-            "content": "Al continuar, el usuario reconoce el propósito académico de la aplicación."
+            "id": "responsible-use",
+            "title": "Uso responsable",
+            "content": "La información registrada en SmartCut debe utilizarse de manera responsable y únicamente dentro del contexto establecido para el proyecto."
         }
     ]
 }

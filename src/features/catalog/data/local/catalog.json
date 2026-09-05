@@ -1,44 +1,69 @@
 [
     {
         "id": "p-001",
-        "name": "Agenda San Mateo 2026",
-        "category": "Papelería",
-        "price": 28000,
+        "name": "Máquina de corte profesional",
+        "category": "Herramientas",
+        "price": 180000,
         "currency": "COP",
-        "stock": 18,
-        "imageKey": "agenda-san-mateo",
-        "shortDescription": "Agenda académica de tapa dura.",
-        "description": "Agenda semanal pensada para organizar clases, metas y entregas.",
+        "stock": 8,
+        "imageKey": "maquina-corte",
+        "shortDescription": "Máquina profesional para cortes de precisión.",
+        "description": "Máquina de corte diseñada para trabajos de barbería y uso profesional.",
         "features": [
-            "Vista semanal",
-            "Tapa dura",
-            "Separadores mensuales"
+            "Motor de alto rendimiento",
+            "Cuchillas de precisión",
+            "Uso inalámbrico"
         ],
         "specifications": {
-            "material": "Papel reciclado",
-            "pages": 160,
-            "size": "A5"
+            "material": "Acero inoxidable y ABS",
+            "batteryHours": 3,
+            "weightGrams": 350
         },
         "isFeatured": true,
         "isAvailable": true
     },
     {
         "id": "p-002",
-        "name": "Termo San Mateo",
-        "category": "Accesorios",
-        "price": 45000,
+        "name": "Cera capilar mate",
+        "category": "Cuidado capilar",
+        "price": 35000,
         "currency": "COP",
-        "stock": 9,
-        "imageKey": "termo-san-mateo",
-        "shortDescription": "Termo metálico de 500 ml.",
-        "description": "Conserva bebidas frías o calientes.",
+        "stock": 15,
+        "imageKey": "cera-capilar",
+        "shortDescription": "Cera de fijación media con acabado mate.",
+        "description": "Producto para peinar y mantener diferentes estilos de cabello durante la jornada.",
         "features": [
-            "500 ml",
-            "Tapa hermética"
+            "Acabado mate",
+            "Fijación media",
+            "Fácil de retirar"
         ],
         "specifications": {
-            "material": "Acero inoxidable",
-            "capacityMl": 500
+            "presentationGrams": 100,
+            "finish": "Mate",
+            "fixation": "Media"
+        },
+        "isFeatured": false,
+        "isAvailable": true
+    },
+    {
+        "id": "p-003",
+        "name": "Aceite para barba",
+        "category": "Cuidado de barba",
+        "price": 28000,
+        "currency": "COP",
+        "stock": 12,
+        "imageKey": "aceite-barba",
+        "shortDescription": "Aceite para hidratar y acondicionar la barba.",
+        "description": "Aceite diseñado para mantener la barba hidratada, suave y con una apariencia cuidada.",
+        "features": [
+            "Hidratación",
+            "Suaviza la barba",
+            "Fácil aplicación"
+        ],
+        "specifications": {
+            "presentationMl": 30,
+            "application": "Tópica",
+            "finish": "Natural"
         },
         "isFeatured": false,
         "isAvailable": true

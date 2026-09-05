@@ -1,14 +1,14 @@
 {
-    "id": "product-experience",
-    "title": "Cuéntanos tu experiencia",
-    "description": "Formulario de práctica para crear campos dinámicos.",
+    "id": "smartcut-experience",
+    "title": "Cuéntanos tu experiencia con SmartCut",
+    "description": "Formulario académico para conocer la experiencia de los usuarios con SmartCut.",
     "submitLabel": "Enviar respuestas",
     "fields": [
         {
-            "id": "fullName",
+            "id": "userName",
             "type": "text",
-            "label": "Nombre completo",
-            "placeholder": "Escribe tu nombre",
+            "label": "Nombre",
+            "placeholder": "Escribe un nombre de prueba",
             "required": true,
             "minLength": 3
         },
@@ -20,17 +20,17 @@
             "required": true
         },
         {
-            "id": "rating",
+            "id": "easeOfUse",
             "type": "select",
-            "label": "¿Cómo calificas el producto?",
+            "label": "¿Qué tan fácil fue utilizar SmartCut?",
             "required": true,
             "options": [
                 {
-                    "label": "Excelente",
+                    "label": "Muy fácil",
                     "value": "5"
                 },
                 {
-                    "label": "Bueno",
+                    "label": "Fácil",
                     "value": "4"
                 },
                 {
@@ -38,7 +38,7 @@
                     "value": "3"
                 },
                 {
-                    "label": "Por mejorar",
+                    "label": "Difícil",
                     "value": "2"
                 }
             ]
@@ -46,13 +46,13 @@
         {
             "id": "recommend",
             "type": "boolean",
-            "label": "¿Lo recomendarías?",
+            "label": "¿Recomendarías SmartCut?",
             "required": false
         },
         {
             "id": "comments",
             "type": "textarea",
-            "label": "Comentarios",
+            "label": "Comentarios sobre SmartCut",
             "placeholder": "Escribe una sugerencia",
             "required": false,
             "maxLength": 300
