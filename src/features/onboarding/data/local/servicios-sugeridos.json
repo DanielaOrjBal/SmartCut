@@ -1,0 +1,50 @@
+[
+  {
+    "id": "s-corte",
+    "categoria": "corte",
+    "nombre": "Corte",
+    "descripcion": "Corte clásico",
+    "duracionMinutos": 30,
+    "precio": 25000
+  },
+  {
+    "id": "s-corte-barba",
+    "categoria": "combo",
+    "nombre": "Corte + Barba americana",
+    "descripcion": "Corte y perfilado",
+    "duracionMinutos": 45,
+    "precio": 35000
+  },
+  {
+    "id": "s-barba",
+    "categoria": "barba",
+    "nombre": "Barba",
+    "descripcion": "Perfilado de barba",
+    "duracionMinutos": 20,
+    "precio": 15000
+  },
+  {
+    "id": "s-diseno",
+    "categoria": "diseno",
+    "nombre": "Diseño",
+    "descripcion": "Diseño personalizado",
+    "duracionMinutos": 20,
+    "precio": 20000
+  },
+  {
+    "id": "s-corte-diseno",
+    "categoria": "combo",
+    "nombre": "Corte + Diseño",
+    "descripcion": "Corte con diseño",
+    "duracionMinutos": 50,
+    "precio": 40000
+  },
+  {
+    "id": "s-tratamiento",
+    "categoria": "tratamiento",
+    "nombre": "Tratamiento capilar",
+    "descripcion": "Hidratación y cuidado",
+    "duracionMinutos": 40,
+    "precio": 30000
+  }
+]
