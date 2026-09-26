@@ -1,0 +1,23 @@
+{
+  "name": "smartcut-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API REST de SmartCut. Todo el acceso a datos pasa por los procedimientos almacenados de smartcut.sql.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.24.3",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
