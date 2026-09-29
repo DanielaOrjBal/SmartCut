@@ -6,6 +6,7 @@ import { DashboardBarberoScreen } from '../../features/dashboard/presentation/sc
 import { AgendaScreen } from '../../features/agenda/presentation/screens/AgendaScreen';
 import { FinanzasScreen } from '../../features/finanzas/presentation/screens/FinanzasScreen';
 import { EquipoScreen } from '../../features/equipo/presentation/screens/EquipoScreen';
+import { PublicPostsScreenContainer } from '../../features/publicPosts/presentation/screens/PublicPostsScreenContainer';
 import { ConfiguracionScreen } from '../../features/configuracion/presentation/screens/ConfiguracionScreen';
 import { ContenidoDrawer } from './ContenidoDrawer';
 import type { AppDrawerParamList } from './types';
@@ -38,6 +39,7 @@ export function AppNavigator({ esAdmin }: Props) {
       <Drawer.Screen name="Agenda" component={AgendaScreen} />
       {esAdmin && <Drawer.Screen name="Equipo" component={EquipoScreen} />}
       <Drawer.Screen name="Finanzas" component={FinanzasScreen} />
+      <Drawer.Screen name="Publicaciones" component={PublicPostsScreenContainer} />
       <Drawer.Screen name="Configuracion" component={ConfiguracionScreen} />
     </Drawer.Navigator>
   );

@@ -33,6 +33,7 @@ export type AppDrawerParamList = {
   Agenda: undefined;
   Equipo: undefined;
   Finanzas: undefined;
+  Publicaciones: undefined;
   Configuracion: undefined;
 };
 

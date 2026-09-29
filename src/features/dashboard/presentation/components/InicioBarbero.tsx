@@ -1,9 +1,10 @@
 import React, { useCallback, useState } from 'react';
-import { RefreshControl, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
+import { Feather } from '@expo/vector-icons';
 
-import { colors, fontSizes, spacing } from '../../../../core/theme/tokens';
+import { colors, fontSizes, radii, shadows, spacing } from '../../../../core/theme/tokens';
 import { formatearCOP } from '../../../../core/utils/moneda';
 import { formatearUltimoAcceso } from '../../../../core/utils/fechas';
 import { Esqueleto, EsqueletoLista } from '../../../../core/components/Esqueleto';
@@ -26,6 +27,7 @@ type Props = {
    * única forma de llegar al resto de las secciones desde ahí.
    */
   onAbrirMenu?: () => void;
+  onVerPublicaciones?: () => void;
 };
 
 /**
@@ -37,7 +39,7 @@ type Props = {
  * backend a partir del JWT. Por eso este componente no recibe ningún id por
  * prop: los pide él mismo.
  */
-export function InicioBarbero({ onAbrirMenu }: Props) {
+export function InicioBarbero({ onAbrirMenu, onVerPublicaciones }: Props) {
   const perfil = usePerfil();
   const resumen = useResumenBarbero();
 
@@ -196,6 +198,32 @@ export function InicioBarbero({ onAbrirMenu }: Props) {
                   ))}
                 </View>
               )}
+
+              {onVerPublicaciones !== undefined && (
+                <Pressable
+                  style={({ pressed }) => [
+                    estilos.tarjetaPublicaciones,
+                    pressed && estilos.tarjetaPublicacionesPresionada,
+                  ]}
+                  onPress={onVerPublicaciones}
+                >
+                  <View style={estilos.iconoContenedor}>
+                    <Feather name="globe" size={24} color={colors.primary} />
+                  </View>
+                  <View style={estilos.textoContenedor}>
+                    <Text style={estilos.tarjetaTitulo}>Ver publicaciones públicas</Text>
+                    <Text style={estilos.tarjetaSubtitulo}>
+                      Consulta información desde un servicio web
+                    </Text>
+                  </View>
+                  <Feather
+                    name="chevron-right"
+                    size={20}
+                    color={colors.placeholder}
+                    style={estilos.chevron}
+                  />
+                </Pressable>
+              )}
             </>
           )}
         </ScrollView>
@@ -250,5 +278,45 @@ const estilos = StyleSheet.create({
     color: colors.navy,
     marginTop: spacing.md,
     marginBottom: spacing.sm,
+  },
+  tarjetaPublicaciones: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.lg,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+    backgroundColor: colors.surface,
+    borderRadius: radii.lg,
+    ...shadows.card,
+  },
+  tarjetaPublicacionesPresionada: {
+    opacity: 0.88,
+  },
+  iconoContenedor: {
+    width: 44,
+    height: 44,
+    borderRadius: radii.lg,
+    backgroundColor: '#FBF4E7',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.lg,
+  },
+  textoContenedor: {
+    flex: 1,
+  },
+  tarjetaTitulo: {
+    fontSize: fontSizes.button,
+    fontWeight: '700',
+    color: colors.navy,
+  },
+  tarjetaSubtitulo: {
+    fontSize: fontSizes.caption,
+    color: colors.textMuted,
+    marginTop: spacing.xs,
+  },
+  chevron: {
+    marginLeft: spacing.md,
   },
 });

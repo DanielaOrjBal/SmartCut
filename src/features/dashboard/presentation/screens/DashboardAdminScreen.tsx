@@ -37,14 +37,9 @@ export function DashboardAdminScreen({ navigation }: AppDrawerScreenProps<'Inici
 
       <View style={estilos.contenido}>
         {vista === 'negocio' ? (
-          <ScrollView
-            contentContainerStyle={estilos.scroll}
-            showsVerticalScrollIndicator={false}
-          >
-            <InicioNegocio />
-          </ScrollView>
+          <InicioNegocio onVerPublicaciones={() => navigation.navigate('Publicaciones')} />
         ) : (
-          <InicioBarbero />
+          <InicioBarbero onVerPublicaciones={() => navigation.navigate('Publicaciones')} />
         )}
       </View>
     </SafeAreaView>
@@ -62,9 +57,4 @@ const estilos = StyleSheet.create({
   },
   conmutador: { flex: 1, marginLeft: spacing.sm },
   contenido: { flex: 1 },
-  scroll: {
-    flexGrow: 1,
-    paddingHorizontal: spacing.screen,
-    paddingBottom: 40,
-  },
 });
