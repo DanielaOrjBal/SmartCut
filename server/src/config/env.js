@@ -17,6 +17,12 @@ const config = {
     secret: process.env.JWT_SECRET || '',
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY || '',
+    // Se mantiene configurable para cambiar de modelo sin desplegar código.
+    model: process.env.GEMINI_MODEL || 'gemini-2.0-flash',
+    timeoutMs: Number(process.env.GEMINI_TIMEOUT_MS) || 15_000,
+  },
 };
 
 /**

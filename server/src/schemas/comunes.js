@@ -77,6 +77,14 @@ const idParam = z.coerce
   .int('Identificador no válido.')
   .positive('Identificador no válido.');
 
+/**
+ * Medios de pago aceptados por SmartCut.
+ * `tarjeta` agrupa crédito y débito como una sola categoría.
+ */
+const medioPago = z.enum(['efectivo', 'tarjeta', 'nequi', 'pse', 'bre_b'], {
+  error: 'El medio de pago no es válido. Usa: efectivo, tarjeta, nequi, pse o bre_b.',
+});
+
 module.exports = {
   texto,
   textoOpcional,
@@ -85,8 +93,8 @@ module.exports = {
   hora,
   idParam,
   fecha,
-  fechaOpcional,
   periodo,
   rangoQuery,
   monto,
+  medioPago,
 };

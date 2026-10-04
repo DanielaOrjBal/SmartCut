@@ -5,6 +5,8 @@ const authRoutes = require('./auth.routes');
 const barberoRoutes = require('./barbero.routes');
 const dashboardRoutes = require('./dashboard.routes');
 const finanzasRoutes = require('./finanzas.routes');
+const asistenteRoutes = require('./asistente.routes');
+const cajaRoutes = require('./caja.routes');
 const equipoRoutes = require('./equipo.routes');
 const barberiaRoutes = require('./barberia.routes');
 
@@ -19,6 +21,8 @@ router.use('/onboarding', onboardingRoutes);
 router.use('/auth', authRoutes);
 
 router.use('/finanzas', finanzasRoutes);
+router.use('/asistente', asistenteRoutes);
+router.use('/caja', cajaRoutes);
 router.use('/equipo', equipoRoutes);
 // GET /api/barberia y PATCH /api/barberia/horario. No choca con
 // GET /api/barberia/:id/barberos de barberoRoutes: distinto método o distinto

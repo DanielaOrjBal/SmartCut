@@ -13,7 +13,8 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { colors, fontSizes, radii, spacing } from '../../../../core/theme/tokens';
 import { formStyles } from '../../../../core/theme/formStyles';
-import { aISO, fechaDesdeISO, formatearFechaLarga, hoyISO } from '../../../../core/utils/fechas';
+import { formatearFechaLarga, hoyISO, sumarDias } from '../../../../core/utils/fechas';
+import { REGEX_HORA } from '../../../../core/validacion/campos';
 import { useRegistrarAusencia } from '../hooks/useAccionesEquipo';
 
 type Props = {
@@ -22,16 +23,6 @@ type Props = {
   onClose: () => void;
   onRegistrada: () => void;
 };
-
-function sumarDias(iso: string, dias: number): string {
-  const fecha = fechaDesdeISO(iso);
-  if (fecha === null) {
-    return iso;
-  }
-  return aISO(new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + dias));
-}
-
-const REGEX_HORA = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 /**
  * Registrar una ausencia o incapacidad. Marcar "es incapacidad" cancela por

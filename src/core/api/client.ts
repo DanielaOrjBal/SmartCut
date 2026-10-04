@@ -37,9 +37,6 @@ export function setAuthToken(token: string | null): void {
   tokenEnMemoria = token;
 }
 
-export function getAuthToken(): string | null {
-  return tokenEnMemoria;
-}
 
 const MENSAJES_POR_ESTADO: Readonly<Record<number, string>> = {
   400: 'Los datos enviados no son válidos.',

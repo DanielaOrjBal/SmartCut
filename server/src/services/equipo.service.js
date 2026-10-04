@@ -199,8 +199,6 @@ async function cambiarComision({ idBarberia, idBarbero, porcentaje }) {
 }
 
 module.exports = {
-  listarBarberosCrudo,
-  exigirBarberoDeLaBarberia,
   listarEquipo,
   detalleBarbero,
   registrarAusencia,

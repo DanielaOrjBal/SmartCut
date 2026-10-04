@@ -5,6 +5,7 @@ import { DashboardAdminScreen } from '../../features/dashboard/presentation/scre
 import { DashboardBarberoScreen } from '../../features/dashboard/presentation/screens/DashboardBarberoScreen';
 import { AgendaScreen } from '../../features/agenda/presentation/screens/AgendaScreen';
 import { FinanzasScreen } from '../../features/finanzas/presentation/screens/FinanzasScreen';
+import { AsistenteAdminScreen } from '../../features/asistente/presentation/screens/AsistenteAdminScreen';
 import { EquipoScreen } from '../../features/equipo/presentation/screens/EquipoScreen';
 import { PublicPostsScreenContainer } from '../../features/publicPosts/presentation/screens/PublicPostsScreenContainer';
 import { ConfiguracionScreen } from '../../features/configuracion/presentation/screens/ConfiguracionScreen';
@@ -39,6 +40,7 @@ export function AppNavigator({ esAdmin }: Props) {
       <Drawer.Screen name="Agenda" component={AgendaScreen} />
       {esAdmin && <Drawer.Screen name="Equipo" component={EquipoScreen} />}
       <Drawer.Screen name="Finanzas" component={FinanzasScreen} />
+      {esAdmin && <Drawer.Screen name="Asistente" component={AsistenteAdminScreen} />}
       <Drawer.Screen name="Publicaciones" component={PublicPostsScreenContainer} />
       <Drawer.Screen name="Configuracion" component={ConfiguracionScreen} />
     </Drawer.Navigator>

@@ -33,6 +33,7 @@ export type AppDrawerParamList = {
   Agenda: undefined;
   Equipo: undefined;
   Finanzas: undefined;
+  Asistente: undefined;
   Publicaciones: undefined;
   Configuracion: undefined;
 };
@@ -40,10 +41,6 @@ export type AppDrawerParamList = {
 export type OnboardingScreenProps<T extends keyof OnboardingStackParamList> =
   NativeStackScreenProps<OnboardingStackParamList, T>;
 
-export type AuthScreenProps<T extends keyof AuthStackParamList> = NativeStackScreenProps<
-  AuthStackParamList,
-  T
->;
 
 export type AppDrawerScreenProps<T extends keyof AppDrawerParamList> = DrawerScreenProps<
   AppDrawerParamList,

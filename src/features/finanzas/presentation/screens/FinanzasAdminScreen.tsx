@@ -18,7 +18,16 @@ import { SelectorPeriodo } from '../../../../core/components/SelectorPeriodo';
 import { EsqueletoLista } from '../../../../core/components/Esqueleto';
 import { EstadoError } from '../../../../core/components/EstadoError';
 import { EstadoVacio } from '../../../../core/components/EstadoVacio';
-import { nombreMesPorNumero, type Periodo } from '../../../../core/utils/fechas';
+import {
+  ETIQUETAS_TRIMESTRE,
+  PERIODOS_FINANZAS,
+  desplazarReferencia,
+  etiquetaDeRango,
+  nombreMesPorNumero,
+  rangoDePeriodo,
+  type Periodo,
+} from '../../../../core/utils/fechas';
+import type { ParametrosPeriodo } from '../../domain/finanzas';
 import { TarjetaResumenFinanciero } from '../components/TarjetaResumenFinanciero';
 import { GraficaIngresosEgresos } from '../components/GraficaIngresosEgresos';
 import { GraficaComparacionBarberos } from '../components/GraficaComparacionBarberos';
@@ -30,16 +39,21 @@ import { useResumenFinanciero } from '../hooks/useResumenFinanciero';
 import { useMovimientos } from '../hooks/useMovimientos';
 import { useInformeMensual } from '../hooks/useInformeMensual';
 import { generarInformePDF } from '../../data/pdf/generarInformePDF';
-import { TIPOS_MOVIMIENTO, type Movimiento, type TipoMovimiento } from '../../domain/finanzas';
+import { ETIQUETA_TIPO_PLURAL, TIPOS_MOVIMIENTO, type Movimiento, type TipoMovimiento } from '../../domain/finanzas';
+import { TarjetaCajaHoy } from '../../../caja/presentation/components/TarjetaCajaHoy';
+import { ModalAbrirCaja } from '../../../caja/presentation/components/ModalAbrirCaja';
+import { ModalCerrarCaja } from '../../../caja/presentation/components/ModalCerrarCaja';
+import { useEstadoCaja } from '../../../caja/presentation/hooks/useEstadoCaja';
+import { SelectorYMetricasBarbero } from '../components/SelectorYMetricasBarbero';
 import type { AppDrawerScreenProps } from '../../../../app/navigation/types';
 
-const ETIQUETA_TIPO: Record<TipoMovimiento, string> = {
-  ingreso: 'Ingresos',
-  gasto: 'Gastos',
-  compra: 'Compras',
-};
-
 const HOY = new Date();
+
+// Primer día del mes actual y del trimestre actual como referencias iniciales
+const REF_MES_INICIAL = new Date(HOY.getFullYear(), HOY.getMonth(), 1);
+const REF_TRIMESTRE_INICIAL = new Date(HOY.getFullYear(), Math.floor(HOY.getMonth() / 3) * 3, 1);
+
+type PeriodoFinanzas = 'mes' | 'trimestre' | 'anio';
 
 /**
  * Finanzas del administrador: resumen con variación, las tres gráficas de la
@@ -47,30 +61,61 @@ const HOY = new Date();
  * manuales y el informe mensual en PDF.
  */
 export function FinanzasAdminScreen({ navigation }: AppDrawerScreenProps<'Finanzas'>) {
-  const [periodo, setPeriodo] = useState<Periodo>('mes');
+  const [periodo, setPeriodo] = useState<PeriodoFinanzas>('mes');
+  const [refMes, setRefMes] = useState<Date>(REF_MES_INICIAL);
+  const [refTrimestre, setRefTrimestre] = useState<Date>(REF_TRIMESTRE_INICIAL);
   const [filtroTipo, setFiltroTipo] = useState<TipoMovimiento | undefined>(undefined);
   const [modalRegistrarVisible, setModalRegistrarVisible] = useState(false);
   const [movimientoAAnular, setMovimientoAAnular] = useState<Movimiento | null>(null);
+  const [modalAbrirCajaVisible, setModalAbrirCajaVisible] = useState(false);
+  const [modalCerrarCajaVisible, setModalCerrarCajaVisible] = useState(false);
 
   const [anioInforme, setAnioInforme] = useState(HOY.getFullYear());
   const [mesInforme, setMesInforme] = useState(HOY.getMonth() + 1);
   const [errorInforme, setErrorInforme] = useState<string | null>(null);
 
-  const resumen = useResumenFinanciero({ periodo });
-  const movimientos = useMovimientos({ periodo, tipo: filtroTipo });
+  // Parámetros que se envían al backend según el período seleccionado.
+  // Para mes y trimestre se usan desde/hasta explícitos para apuntar al período
+  // navegado (no siempre el actual). Para año el servidor calcula el rango.
+  const parametrosPeriodo: ParametrosPeriodo =
+    periodo === 'mes'
+      ? rangoDePeriodo('mes', refMes)
+      : periodo === 'trimestre'
+        ? rangoDePeriodo('trimestre', refTrimestre)
+        : { periodo: 'anio' as Periodo };
+
+  const resumen = useResumenFinanciero(parametrosPeriodo);
+  const movimientos = useMovimientos({ ...parametrosPeriodo, tipo: filtroTipo });
   const informe = useInformeMensual();
+  const estadoCaja = useEstadoCaja();
 
   useFocusEffect(
     useCallback(() => {
       resumen.refetch();
       movimientos.refetch();
+      estadoCaja.refetch();
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [periodo, filtroTipo]),
+    }, [periodo, refMes, refTrimestre, filtroTipo]),
   );
 
   function refrescarTodo() {
     resumen.refetch();
     movimientos.refetch();
+    estadoCaja.refetch();
+  }
+
+  function moverMes(pasos: 1 | -1) {
+    setRefMes((prev) => desplazarReferencia('mes', prev, pasos));
+  }
+
+  function moverTrimestre(pasos: 1 | -1) {
+    setRefTrimestre((prev) => desplazarReferencia('trimestre', prev, pasos));
+  }
+
+  function cambiarPeriodo(nuevo: Periodo) {
+    if (nuevo === 'mes' || nuevo === 'trimestre' || nuevo === 'anio') {
+      setPeriodo(nuevo);
+    }
   }
 
   async function descargarInforme() {
@@ -102,15 +147,57 @@ export function FinanzasAdminScreen({ navigation }: AppDrawerScreenProps<'Finanz
 
   const lista = movimientos.data?.movimientos ?? [];
 
+  const etiquetaMes = etiquetaDeRango('mes', refMes);
+  const numTrimestre = Math.floor(refTrimestre.getMonth() / 3);
+  const etiquetaTrimestre = `T${numTrimestre + 1}: ${ETIQUETAS_TRIMESTRE[numTrimestre]} ${refTrimestre.getFullYear()}`;
+
   return (
     <SafeAreaView style={estilos.safeArea} edges={['top', 'bottom']}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
       <EncabezadoPantalla titulo="Finanzas" onAbrirMenu={() => navigation.openDrawer()}>
-        <SelectorPeriodo valor={periodo} onCambiar={setPeriodo} />
       </EncabezadoPantalla>
 
       <ScrollView contentContainerStyle={estilos.scroll} showsVerticalScrollIndicator={false}>
-        {/* Bloque 1: resumen */}
+        {/* Bloque 1: caja del día */}
+        <Text style={estilos.tituloSeccion}>Caja del día</Text>
+        {estadoCaja.loading && estadoCaja.data === null ? (
+          <EsqueletoLista filas={1} />
+        ) : estadoCaja.error !== null ? (
+          <EstadoError mensaje={estadoCaja.error} onReintentar={estadoCaja.refetch} />
+        ) : estadoCaja.data !== null ? (
+          <TarjetaCajaHoy
+            estado={estadoCaja.data}
+            cargando={estadoCaja.loading}
+            onAbrirCaja={() => setModalAbrirCajaVisible(true)}
+            onCerrarCaja={() => setModalCerrarCajaVisible(true)}
+          />
+        ) : null}
+
+
+        {/* Bloque 1b: resumen */}
+        <SelectorPeriodo valor={periodo} onCambiar={cambiarPeriodo} opciones={PERIODOS_FINANZAS} centrado/>
+        {periodo === 'mes' && (
+          <View style={estilos.navegadorPeriodo}>
+            <TouchableOpacity style={estilos.flechaNavegador} onPress={() => moverMes(-1)}>
+              <Feather name="chevron-left" size={20} color={colors.navy} />
+            </TouchableOpacity>
+            <Text style={estilos.textoNavegador}>{etiquetaMes}</Text>
+            <TouchableOpacity style={estilos.flechaNavegador} onPress={() => moverMes(1)}>
+              <Feather name="chevron-right" size={20} color={colors.navy} />
+            </TouchableOpacity>
+          </View>
+        )}
+        {periodo === 'trimestre' && (
+          <View style={estilos.navegadorPeriodo}>
+            <TouchableOpacity style={estilos.flechaNavegador} onPress={() => moverTrimestre(-1)}>
+              <Feather name="chevron-left" size={20} color={colors.navy} />
+            </TouchableOpacity>
+            <Text style={estilos.textoNavegador}>{etiquetaTrimestre}</Text>
+            <TouchableOpacity style={estilos.flechaNavegador} onPress={() => moverTrimestre(1)}>
+              <Feather name="chevron-right" size={20} color={colors.navy} />
+            </TouchableOpacity>
+          </View>
+        )}
         {resumen.loading && resumen.data === null ? (
           <EsqueletoLista filas={2} />
         ) : resumen.error !== null ? (
@@ -118,11 +205,14 @@ export function FinanzasAdminScreen({ navigation }: AppDrawerScreenProps<'Finanz
         ) : resumen.data !== null ? (
           <TarjetaResumenFinanciero resumen={resumen.data} />
         ) : null}
+        {/* Bloque 1c: métricas por barbero */}
+        <Text style={estilos.tituloSeccion}>Métricas por barbero</Text>
+        <SelectorYMetricasBarbero parametros={parametrosPeriodo} />
 
         {/* Bloque 2: gráficas */}
         <Text style={estilos.tituloSeccion}>Gráficas</Text>
-        <GraficaIngresosEgresos parametros={{ periodo }} />
-        <GraficaComparacionBarberos parametros={{ periodo }} />
+        <GraficaIngresosEgresos parametros={parametrosPeriodo} />
+        <GraficaComparacionBarberos parametros={parametrosPeriodo} />
         <GraficaGastosAnuales />
 
         {/* Informe mensual en PDF */}
@@ -171,7 +261,7 @@ export function FinanzasAdminScreen({ navigation }: AppDrawerScreenProps<'Finanz
           {TIPOS_MOVIMIENTO.map((tipo) => (
             <ChipFiltro
               key={tipo}
-              texto={ETIQUETA_TIPO[tipo]}
+              texto={ETIQUETA_TIPO_PLURAL[tipo]}
               activo={filtroTipo === tipo}
               onPress={() => setFiltroTipo(tipo)}
             />
@@ -212,6 +302,32 @@ export function FinanzasAdminScreen({ navigation }: AppDrawerScreenProps<'Finanz
         onClose={() => setMovimientoAAnular(null)}
         onAnulado={refrescarTodo}
       />
+
+      <ModalAbrirCaja
+        visible={modalAbrirCajaVisible}
+        onClose={() => setModalAbrirCajaVisible(false)}
+        onAbierta={() => {
+          setModalAbrirCajaVisible(false);
+          estadoCaja.refetch();
+        }}
+      />
+
+      {estadoCaja.data !== null &&
+        estadoCaja.data.caja !== null &&
+        estadoCaja.data.caja.estado === 'abierta' &&
+        estadoCaja.data.saldoEsperadoEfectivo !== null && (
+          <ModalCerrarCaja
+            visible={modalCerrarCajaVisible}
+            caja={estadoCaja.data.caja}
+            desglose={estadoCaja.data.desglose}
+            saldoEsperadoEfectivo={estadoCaja.data.saldoEsperadoEfectivo}
+            onClose={() => setModalCerrarCajaVisible(false)}
+            onCerrada={() => {
+              setModalCerrarCajaVisible(false);
+              estadoCaja.refetch();
+            }}
+          />
+        )}
     </SafeAreaView>
   );
 }
@@ -237,6 +353,22 @@ const estilos = StyleSheet.create({
     color: colors.navy,
     marginTop: spacing.md,
     marginBottom: spacing.sm,
+  },
+  navegadorPeriodo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.xs,
+  },
+  flechaNavegador: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
+  textoNavegador: {
+    fontSize: fontSizes.small,
+    fontWeight: '700',
+    color: colors.navy,
+    marginHorizontal: spacing.md,
+    textTransform: 'capitalize',
+    minWidth: 160,
+    textAlign: 'center',
   },
   tarjetaInforme: {
     backgroundColor: colors.surface,

@@ -1,30 +1,13 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { colors, estadoCitaColors, fontSizes, radii, spacing } from '../../../../core/theme/tokens';
-import type { EstadoBarbero } from '../../../auth/domain/auth';
+import { colors, fontSizes, radii, spacing } from '../../../../core/theme/tokens';
 import type { BarberoEquipo } from '../../domain/equipo';
+import { COLOR_ESTADO, ETIQUETA_ESTADO } from '../constantes';
 
 type Props = {
   barbero: BarberoEquipo;
   onPress: () => void;
-};
-
-/**
- * Verde de éxito ya usado en otras tarjetas de la app, y el naranja oficial
- * de "no_asistio" para incapacitado — misma familia de significado (algo que
- * hoy no está funcionando), sin sumar un color nuevo a la paleta.
- */
-const COLOR_ESTADO: Record<EstadoBarbero, string> = {
-  activo: '#16A34A',
-  incapacitado: estadoCitaColors.no_asistio,
-  inactivo: colors.danger,
-};
-
-const ETIQUETA_ESTADO: Record<EstadoBarbero, string> = {
-  activo: 'Activo',
-  incapacitado: 'Incapacitado',
-  inactivo: 'Inactivo',
 };
 
 /** Una fila de la lista del equipo. */

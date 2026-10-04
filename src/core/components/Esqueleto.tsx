@@ -42,20 +42,6 @@ export function Esqueleto({ ancho = '100%', alto = 16, radio = radii.md, estilo 
   );
 }
 
-/** Rejilla 2×2 de tarjetas, para las pantallas de Inicio mientras cargan. */
-export function EsqueletoTarjetas() {
-  return (
-    <View style={estilos.grilla}>
-      {[0, 1, 2, 3].map((indice) => (
-        <View key={indice} style={estilos.tarjeta}>
-          <Esqueleto ancho={28} alto={28} radio={radii.md} />
-          <Esqueleto ancho="70%" alto={20} estilo={estilos.espacioSuperior} />
-          <Esqueleto ancho="50%" alto={12} estilo={estilos.espacioSuperior} />
-        </View>
-      ))}
-    </View>
-  );
-}
 
 /** Lista de renglones, para agenda y listas de movimientos mientras cargan. */
 export function EsqueletoLista({ filas = 4 }: { filas?: number }) {
@@ -76,20 +62,6 @@ export function EsqueletoLista({ filas = 4 }: { filas?: number }) {
 
 const estilos = StyleSheet.create({
   base: { backgroundColor: colors.border },
-  grilla: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  tarjeta: {
-    width: '48%',
-    backgroundColor: colors.surface,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 16,
-    marginBottom: 12,
-  },
   espacioSuperior: { marginTop: 8 },
   fila: {
     flexDirection: 'row',

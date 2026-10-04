@@ -1,5 +1,5 @@
 import { useMutacion, type EstadoMutacion } from '../../../../core/hooks/useMutacion';
-import { useMemo } from 'react';
+
 import * as equipoApi from '../../data/remote/equipo.api';
 import type { EstadoBarbero } from '../../../auth/domain/auth';
 import type {
@@ -55,15 +55,3 @@ export function useCrearBarbero(): EstadoMutacion<NuevoBarbero, BarberoCreado> {
   return mutacion;
 }
 
-/** Agrupa las cuatro mutaciones de acciones de equipo, por si una pantalla las necesita todas. */
-export function useAccionesEquipo() {
-  const registrarAusencia = useRegistrarAusencia();
-  const cambiarEstado = useCambiarEstadoBarbero();
-  const cambiarComision = useCambiarComision();
-  const crearBarbero = useCrearBarbero();
-
-  return useMemo(
-    () => ({ registrarAusencia, cambiarEstado, cambiarComision, crearBarbero }),
-    [registrarAusencia, cambiarEstado, cambiarComision, crearBarbero],
-  );
-}

@@ -1,6 +1,7 @@
 import { apiClient } from '../../../../core/api/client';
 import { construirQuery } from '../../../../core/utils/query';
 import type { AgendaParametros, AgendaResultado, Cita, EstadoCita } from '../../domain/agenda';
+import type { MedioPago } from '../../../../core/components/SelectorMedioPago';
 
 /**
  * GET /api/agenda
@@ -24,6 +25,8 @@ export type CambiarEstadoCitaRequest = {
   /** La fecha de la cita, no la de hoy: es lo que permite ubicarla en el backend. */
   fecha: string;
   motivo?: string;
+  /** Obligatorio solo cuando estado = 'finalizada'. */
+  medioPago?: MedioPago;
 };
 
 /** PATCH /api/citas/:id/estado */
@@ -32,6 +35,7 @@ export function cambiarEstadoCita({
   estado,
   fecha,
   motivo,
+  medioPago,
 }: CambiarEstadoCitaRequest): Promise<{ cita: Cita }> {
-  return apiClient.patch(`/citas/${idCita}/estado`, { estado, fecha, motivo });
+  return apiClient.patch(`/citas/${idCita}/estado`, { estado, fecha, motivo, medioPago });
 }

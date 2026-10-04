@@ -162,11 +162,8 @@ function hoyISO() {
 }
 
 module.exports = {
-  PERIODOS_VALIDOS,
   aISO,
   desdeISO,
-  hoyISO,
-  rangoDe,
   resolverPeriodo,
   periodoAnterior,
 };

@@ -13,8 +13,10 @@ import type { Periodo } from '../../../../core/utils/fechas';
 import { GraficaComisionBarbero } from '../components/GraficaComisionBarbero';
 import { TarjetaPosicionRanking } from '../components/TarjetaPosicionRanking';
 import { ListaMovimientos } from '../components/ListaMovimientos';
+import { TarjetaMetricasBarbero } from '../components/TarjetaMetricasBarbero';
 import { useRanking } from '../hooks/useRanking';
 import { useMisMovimientos } from '../hooks/useMovimientos';
+import { useMisMetricas } from '../hooks/useMisMetricas';
 import type { AppDrawerScreenProps } from '../../../../app/navigation/types';
 
 /**
@@ -26,11 +28,13 @@ export function FinanzasBarberoScreen({ navigation }: AppDrawerScreenProps<'Fina
 
   const ranking = useRanking({ periodo });
   const movimientos = useMisMovimientos({ periodo });
+  const metricas = useMisMetricas({ periodo });
 
   useFocusEffect(
     useCallback(() => {
       ranking.refetch();
       movimientos.refetch();
+      metricas.refetch();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [periodo]),
   );
@@ -48,6 +52,13 @@ export function FinanzasBarberoScreen({ navigation }: AppDrawerScreenProps<'Fina
         <GraficaComisionBarbero parametros={{ periodo }} />
 
         {ranking.data !== null && <TarjetaPosicionRanking ranking={ranking.data} />}
+
+        {metricas.data !== null && metricas.data !== undefined && (
+          <>
+            <Text style={estilos.tituloSeccion}>Tus métricas</Text>
+            <TarjetaMetricasBarbero datos={metricas.data} esAdmin={false} />
+          </>
+        )}
 
         <Text style={estilos.tituloSeccion}>Tus atenciones</Text>
         {movimientos.loading && movimientos.data === null ? (

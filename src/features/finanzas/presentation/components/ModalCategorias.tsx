@@ -6,19 +6,13 @@ import { formStyles } from '../../../../core/theme/formStyles';
 import { Esqueleto } from '../../../../core/components/Esqueleto';
 import { EstadoError } from '../../../../core/components/EstadoError';
 import { useCategorias, useCrearCategoria } from '../hooks/useCategorias';
-import { TIPOS_MOVIMIENTO, type TipoMovimiento } from '../../domain/finanzas';
+import { ETIQUETA_TIPO_PLURAL, TIPOS_MOVIMIENTO, type TipoMovimiento } from '../../domain/finanzas';
 
 type Props = {
   visible: boolean;
   onClose: () => void;
   /** Se llama tras crear una categoría, para que quien la abrió refresque su propia lista. */
   onCreada?: () => void;
-};
-
-const ETIQUETA_TIPO: Record<TipoMovimiento, string> = {
-  ingreso: 'Ingresos',
-  gasto: 'Gastos',
-  compra: 'Compras',
 };
 
 /**
@@ -80,7 +74,7 @@ export function ModalCategorias({ visible, onClose, onCreada }: Props) {
                 }
                 return (
                   <View key={tipoGrupo} style={estilos.grupo}>
-                    <Text style={estilos.tituloGrupo}>{ETIQUETA_TIPO[tipoGrupo]}</Text>
+                    <Text style={estilos.tituloGrupo}>{ETIQUETA_TIPO_PLURAL[tipoGrupo]}</Text>
                     {delGrupo.map((categoria) => (
                       <View key={categoria.idCategoria} style={estilos.filaCategoria}>
                         <Text style={estilos.nombreCategoria}>{categoria.nombre}</Text>
@@ -102,7 +96,7 @@ export function ModalCategorias({ visible, onClose, onCreada }: Props) {
                   onPress={() => setTipo(opcion)}
                 >
                   <Text style={[estilos.chipTexto, tipo === opcion && estilos.chipTextoActivo]}>
-                    {ETIQUETA_TIPO[opcion]}
+                    {ETIQUETA_TIPO_PLURAL[opcion]}
                   </Text>
                 </TouchableOpacity>
               ))}

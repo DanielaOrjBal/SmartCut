@@ -11,6 +11,18 @@ export type ParametrosPeriodo = {
 export const TIPOS_MOVIMIENTO = ['ingreso', 'gasto', 'compra'] as const;
 export type TipoMovimiento = (typeof TIPOS_MOVIMIENTO)[number];
 
+export const ETIQUETA_TIPO: Record<TipoMovimiento, string> = {
+  ingreso: 'Ingreso',
+  gasto: 'Gasto',
+  compra: 'Compra',
+};
+
+export const ETIQUETA_TIPO_PLURAL: Record<TipoMovimiento, string> = {
+  ingreso: 'Ingresos',
+  gasto: 'Gastos',
+  compra: 'Compras',
+};
+
 // -------------------------------------------------------------- resumen ---
 
 /**
@@ -122,6 +134,8 @@ export type Movimiento = {
   unidadMedida: string | null;
   descripcion: string | null;
   idCita: number | null;
+  /** Presente en ingresos generados por citas. Null en gastos y compras manuales. */
+  medioPago: string | null;
   origen: 'manual' | 'automatico';
   estado: 'activo' | 'anulado';
   /** 'YYYY-MM-DD HH:mm:ss' */
@@ -152,6 +166,38 @@ export type Categoria = {
   nombre: string;
   tipo: TipoMovimiento;
   activa: boolean;
+};
+
+// ---------------------------------------------------------- métricas barbero ---
+
+export type ResumenMetricasBarbero = {
+  idBarbero: number;
+  barbero: string;
+  porcentajeComision: number;
+  citasAtendidas: number;
+  facturacion: number;
+  comision: number;
+  ticketPromedio: number;
+};
+
+export type DesgloseMedioBarbero = {
+  medioPago: string;
+  citas: number;
+  facturado: number;
+};
+
+export type DesgloseServicioBarbero = {
+  idServicio: number;
+  servicio: string;
+  veces: number;
+  facturado: number;
+};
+
+export type MetricasBarbero = {
+  rango: RangoFechas;
+  resumen: ResumenMetricasBarbero | null;
+  mediosPago: DesgloseMedioBarbero[];
+  servicios: DesgloseServicioBarbero[];
 };
 
 // -------------------------------------------------------------- informe ---

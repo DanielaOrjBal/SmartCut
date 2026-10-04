@@ -171,6 +171,16 @@ export const PERIODOS: ReadonlyArray<{ valor: Periodo; etiqueta: string }> = [
   { valor: 'anio', etiqueta: 'Año' },
 ];
 
+/** Subconjunto de períodos que expone el módulo de Finanzas del administrador. */
+export const PERIODOS_FINANZAS: ReadonlyArray<{ valor: Periodo; etiqueta: string }> = [
+  { valor: 'mes', etiqueta: 'Mes' },
+  { valor: 'trimestre', etiqueta: 'Trimestre' },
+  { valor: 'anio', etiqueta: 'Año' },
+];
+
+/** Etiqueta corta de cada trimestre para el navegador de finanzas. */
+export const ETIQUETAS_TRIMESTRE = ['Ene – Mar', 'Abr – Jun', 'Jul – Sep', 'Oct – Dic'] as const;
+
 /**
  * Rango de un período alrededor de una fecha de referencia.
  *
@@ -260,4 +270,13 @@ export function etiquetaDeRango(periodo: Periodo, referencia: Date): string {
     case 'anio':
       return `${inicio.getFullYear()}`;
   }
+}
+
+/** Suma (o resta) días a una fecha ISO sin pasar por husos horarios. */
+export function sumarDias(iso: string, dias: number): string {
+  const fecha = fechaDesdeISO(iso);
+  if (fecha === null) {
+    return iso;
+  }
+  return aISO(new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + dias));
 }
