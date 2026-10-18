@@ -6,7 +6,6 @@ export function DashboardBarberoScreen({ navigation }: AppDrawerScreenProps<'Ini
   return (
     <InicioBarbero
       onAbrirMenu={() => navigation.openDrawer()}
-      onVerPublicaciones={() => navigation.navigate('Publicaciones')}
     />
   );
 }

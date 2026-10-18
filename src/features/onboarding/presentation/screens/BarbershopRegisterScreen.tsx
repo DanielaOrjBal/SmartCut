@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { BotonPrimario } from '../../../../core/components/BotonPrimario';
 import { CampoTexto } from '../../../../core/components/CampoTexto';
-import { colors, fontSizes, radii, spacing } from '../../../../core/theme/tokens';
 import { correoValido, requerido, telefonoValido } from '../../../../core/validacion/campos';
 import type { OnboardingScreenProps } from '../../../../app/navigation/types';
 import { useOnboarding } from '../context/OnboardingContext';
-import { PasoLayout } from '../components';
+import { PasoLayout, SelectorDireccion } from '../components';
 
 export const BarbershopRegisterScreen = ({
   navigation,
@@ -56,24 +54,19 @@ export const BarbershopRegisterScreen = ({
         maxLength={150}
       />
 
-      <CampoTexto
-        etiqueta="UBICACIÓN / DIRECCIÓN"
-        placeholder="Ej. Calle 45 # 12-30, Bogotá"
+      <SelectorDireccion
         valor={barberia.direccion}
-        onCambiar={(direccion) => actualizarBarberia({ direccion })}
-        onBlur={() => marcar('direccion')}
+        onSeleccionar={(direccion, latitud, longitud) => {
+          actualizarBarberia({ direccion, latitud, longitud });
+          marcar('direccion');
+        }}
+        onCambiarTexto={(texto) => {
+          actualizarBarberia({ direccion: texto, latitud: undefined, longitud: undefined });
+          marcar('direccion');
+        }}
         error={errores.direccion}
         tocado={tocados.direccion}
-        maxLength={200}
       />
-
-      <TouchableOpacity style={estilos.mapBox} activeOpacity={0.7} disabled>
-        <View style={estilos.mapIconPlaceholder}>
-          <Text style={estilos.mapIconText}>📍</Text>
-        </View>
-        <Text style={estilos.mapBoxText}>Confirmar ubicación en mapa</Text>
-        <Text style={estilos.mapBoxNota}>Disponible próximamente</Text>
-      </TouchableOpacity>
 
       <CampoTexto
         etiqueta="TELÉFONO DE CONTACTO"
@@ -102,33 +95,3 @@ export const BarbershopRegisterScreen = ({
     </PasoLayout>
   );
 };
-
-const estilos = StyleSheet.create({
-  mapBox: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    borderRadius: radii.lg,
-    paddingVertical: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 18,
-    borderStyle: 'dashed',
-  },
-  mapIconPlaceholder: {
-    marginBottom: 6,
-  },
-  mapIconText: {
-    fontSize: 22,
-  },
-  mapBoxText: {
-    fontSize: fontSizes.small,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  mapBoxNota: {
-    fontSize: fontSizes.caption,
-    color: colors.placeholder,
-    marginTop: spacing.xs,
-  },
-});

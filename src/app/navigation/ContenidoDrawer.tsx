@@ -19,7 +19,6 @@ const ITEMS_BARBERO: ItemMenu[] = [
   { ruta: 'Inicio', etiqueta: 'Inicio', icono: 'home' },
   { ruta: 'Agenda', etiqueta: 'Agenda', icono: 'calendar' },
   { ruta: 'Finanzas', etiqueta: 'Finanzas', icono: 'dollar-sign' },
-  { ruta: 'Publicaciones', etiqueta: 'Publicaciones', icono: 'globe' },
   { ruta: 'Configuracion', etiqueta: 'Configuración', icono: 'settings' },
 ];
 
@@ -30,7 +29,6 @@ const ITEMS_ADMIN: ItemMenu[] = [
   { ruta: 'Equipo', etiqueta: 'Equipo', icono: 'users' },
   { ruta: 'Finanzas', etiqueta: 'Finanzas', icono: 'dollar-sign' },
   { ruta: 'Asistente', etiqueta: 'Asistente IA', icono: 'cpu' },
-  { ruta: 'Publicaciones', etiqueta: 'Publicaciones', icono: 'globe' },
   { ruta: 'Configuracion', etiqueta: 'Configuración', icono: 'settings' },
 ];
 

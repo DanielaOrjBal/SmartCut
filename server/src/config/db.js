@@ -20,17 +20,24 @@ const pool = mysql.createPool({
   queueLimit: 0,
   // Los DECIMAL de precios y montos llegan como string si no se pide esto.
   decimalNumbers: true,
-  // Colombia no tiene horario de verano, así que el offset es fijo. Sin esto
-  // mysql2 convierte los DATETIME usando la zona del proceso al escribir y la
-  // zona local del driver al leer: una atención registrada a las 7 p.m. se
-  // guardaría corrida cinco horas y CURDATE() del servidor y el "hoy" de Node
-  // dejarían de coincidir en el tramo final del día.
+  // Afecta cómo mysql2 serializa objetos Date de JS al enviarlos a MySQL.
+  // NO cambia el timezone de sesión de MySQL (eso lo hace el listener abajo).
   timezone: '-05:00',
   // Fechas y horas de MySQL como texto plano ('2026-09-07', '14:30:00').
   // Un DATE convertido a objeto Date de JS se ancla a medianoche local y, al
   // serializarse a JSON, viaja en UTC como el día anterior. La app necesita la
   // fecha calendario exacta que devolvió la base, no un instante.
   dateStrings: true,
+});
+
+// Fija el timezone de SESIÓN de MySQL en cada nueva conexión del pool.
+// Sin esto, CURDATE() y NOW() dentro de los procedimientos almacenados usan
+// el timezone del servidor MySQL (normalmente UTC): una caja abierta o cerrada
+// después de las 7 p.m. Bogotá (= medianoche UTC) quedaría registrada con la
+// fecha del día siguiente, y al abrir la app la mañana siguiente aparecería
+// "Cerrada" en lugar de "Sin abrir".
+pool.pool.on('connection', (conexion) => {
+  conexion.query("SET time_zone = '-05:00'");
 });
 
 /**

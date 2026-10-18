@@ -98,22 +98,36 @@ function conTimeout(promesa, milisegundos) {
   return Promise.race([promesa, limite]).finally(() => clearTimeout(temporizador));
 }
 
+/**
+ * Llama a la API de Gemini con un reintento automático de 2 segundos si el
+ * primer intento falla (timeout o error de red). El segundo fallo se propaga
+ * al llamador para que lo convierta en una respuesta amigable.
+ */
+async function llamarConReintento(cliente, params, timeoutMs) {
+  try {
+    return await conTimeout(cliente.models.generateContent(params), timeoutMs);
+  } catch (primerError) {
+    console.error(`[gemini] Primer intento fallido: ${primerError.constructor.name}. Reintentando en 2s…`);
+    await new Promise((resolver) => setTimeout(resolver, 2000));
+    // El segundo intento se propaga sin capturar: lo maneja consultarAsistente
+    return await conTimeout(cliente.models.generateContent(params), timeoutMs);
+  }
+}
+
 async function consultarAsistente({ idBarberia, pregunta }) {
   const contexto = await obtenerContextoFinanciero(idBarberia);
   const cliente = obtenerClienteGemini();
 
   let interaccion;
   try {
-    interaccion = await conTimeout(
-      cliente.models.generateContent({
-        model: config.gemini.model,
-        contents: construirInstruccion(contexto, pregunta),
-      }),
+    interaccion = await llamarConReintento(
+      cliente,
+      { model: config.gemini.model, contents: construirInstruccion(contexto, pregunta) },
       config.gemini.timeoutMs,
     );
   } catch (error) {
     if (error instanceof AppError) throw error;
-    throw new AppError('No pudimos consultar el asistente financiero. Intenta de nuevo.', 502);
+    throw new AppError('El asistente no está disponible en este momento. Intenta de nuevo más tarde.', 502);
   }
 
   const respuesta = typeof interaccion.text === 'string' ? interaccion.text.trim() : '';

@@ -1,6 +1,7 @@
 const { pool } = require('../config/db');
-const { primeraFila, filas } = require('../utils/sp');
+const { primeraFila, filas, oNulo } = require('../utils/sp');
 const { AppError } = require('../utils/AppError');
+const { encolarCorreo } = require('../queues/emailQueue');
 
 /**
  * Métricas de inicio, perfil y catálogo de servicios.
@@ -107,4 +108,30 @@ async function listarServicios(idBarberia) {
     }));
 }
 
-module.exports = { numero, resumenBarbero, resumenBarberia, perfil, listarServicios };
+/**
+ * Actualiza nombre, apellido y teléfono del barbero.
+ * El correo no es editable: está en el JWT y tiene UNIQUE KEY.
+ */
+async function actualizarPerfil({ idBarbero, nombre, apellido, telefono }) {
+  await pool.query('CALL sp_actualizar_perfil_barbero(?, ?, ?, ?)', [
+    idBarbero,
+    nombre,
+    oNulo(apellido),
+    oNulo(telefono),
+  ]);
+
+  const perfilActualizado = await perfil(idBarbero);
+
+  try {
+    await encolarCorreo('actualizacion_perfil', {
+      nombre: perfilActualizado.nombre,
+      correo: perfilActualizado.correo,
+    });
+  } catch (emailErr) {
+    console.error('[dashboard] No se pudo encolar correo de actualización de perfil:', emailErr.message);
+  }
+
+  return perfilActualizado;
+}
+
+module.exports = { numero, resumenBarbero, resumenBarberia, perfil, listarServicios, actualizarPerfil };

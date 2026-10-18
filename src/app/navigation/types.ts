@@ -34,7 +34,6 @@ export type AppDrawerParamList = {
   Equipo: undefined;
   Finanzas: undefined;
   Asistente: undefined;
-  Publicaciones: undefined;
   Configuracion: undefined;
 };
 

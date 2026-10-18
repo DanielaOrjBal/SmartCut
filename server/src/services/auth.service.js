@@ -3,6 +3,7 @@ const { comparar, compararSenuelo, hashear } = require('../utils/password');
 const { firmarToken } = require('../utils/jwt');
 const { primeraFila } = require('../utils/sp');
 const { AppError } = require('../utils/AppError');
+const { encolarCorreo } = require('../queues/emailQueue');
 
 /**
  * Un único mensaje para "el correo no existe" y "la contraseña es incorrecta".
@@ -93,6 +94,15 @@ async function cambiarContrasena({ idBarbero, correo, contrasenaActual, contrase
 
   // Baja debe_cambiar_contrasena a 0.
   await pool.query('CALL sp_cambiar_contrasena(?, ?)', [idBarbero, await hashear(contrasenaNueva)]);
+
+  try {
+    await encolarCorreo('cambio_contrasena', {
+      nombre: fila.nombre,
+      correo,
+    });
+  } catch (emailErr) {
+    console.error('[auth] No se pudo encolar correo de cambio de contraseña:', emailErr.message);
+  }
 
   return { ...construirPerfil(fila), debeCambiarContrasena: false };
 }

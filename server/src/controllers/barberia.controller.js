@@ -10,6 +10,7 @@ async function obtenerBarberia(req, res) {
 async function actualizarHorario(req, res) {
   const barberia = await barberiaService.actualizarHorario({
     idBarberia: req.usuario.idBarberia,
+    correoAdmin: req.usuario.correo,
     ...req.body,
   });
   res.json({ barberia });

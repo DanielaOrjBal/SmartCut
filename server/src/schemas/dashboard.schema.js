@@ -65,9 +65,30 @@ const estadoCitaSchema = z
 
 const idParamsSchema = z.object({ id: idParam });
 
+/**
+ * Actualización de datos personales del barbero/admin.
+ * Correo excluido: está en el JWT activo y tiene UNIQUE KEY.
+ */
+const actualizarPerfilSchema = z.object({
+  nombre: texto(80, 'El nombre'),
+  apellido: z
+    .string()
+    .trim()
+    .max(80, 'El apellido no puede superar 80 caracteres.')
+    .nullable()
+    .optional(),
+  telefono: z
+    .string()
+    .trim()
+    .max(20, 'El teléfono no puede superar 20 caracteres.')
+    .nullable()
+    .optional(),
+});
+
 module.exports = {
   agendaQuerySchema,
   crearAtencionSchema,
   estadoCitaSchema,
   idParamsSchema,
+  actualizarPerfilSchema,
 };

@@ -37,9 +37,9 @@ export function DashboardAdminScreen({ navigation }: AppDrawerScreenProps<'Inici
 
       <View style={estilos.contenido}>
         {vista === 'negocio' ? (
-          <InicioNegocio onVerPublicaciones={() => navigation.navigate('Publicaciones')} />
+          <InicioNegocio />
         ) : (
-          <InicioBarbero onVerPublicaciones={() => navigation.navigate('Publicaciones')} />
+          <InicioBarbero />
         )}
       </View>
     </SafeAreaView>

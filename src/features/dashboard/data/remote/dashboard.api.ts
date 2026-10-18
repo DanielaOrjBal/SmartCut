@@ -11,12 +11,12 @@ export function obtenerResumenBarberia(): Promise<{ resumen: ResumenBarberia }> 
   return apiClient.get('/dashboard/barberia');
 }
 
-/** GET /api/perfil */
+/** GET /api/dashboard/perfil */
 export function obtenerPerfil(): Promise<{ perfil: PerfilUsuario }> {
-  return apiClient.get('/perfil');
+  return apiClient.get('/dashboard/perfil');
 }
 
-/** GET /api/servicios — catálogo activo, para el modal de registro de atención. */
+/** GET /api/dashboard/servicios — catálogo activo, para el modal de registro de atención. */
 export function listarServicios(): Promise<{ servicios: Servicio[] }> {
-  return apiClient.get('/servicios');
+  return apiClient.get('/dashboard/servicios');
 }
