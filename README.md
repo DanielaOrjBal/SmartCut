@@ -265,20 +265,6 @@ SmartCut/
 
 Cada feature sigue la misma forma: `data/remote/`, `domain/`, `presentation/{screens,components,hooks}/`.
 
-### Decisiones de arquitectura
-
-- **El onboarding acumula en memoria y guarda una sola vez.** Un único POST procesado en transacción; si algo falla, no queda nada a medias.
-- **La contraseña se hashea en el servidor, nunca en el cliente.**
-- **Todo el acceso a datos pasa por procedimientos almacenados.** No hay SQL suelto en los controladores.
-- **La base de datos no valida contraseñas.** `sp_obtener_credenciales` devuelve el hash y Node compara con `bcrypt.compare()`.
-- **El JWT se guarda en `expo-secure-store`** (Keychain/Keystore). AsyncStorage solo guarda la marca de "onboarding completado".
-- **`idBarberia` nunca sale del body ni de la query.** Siempre del JWT.
-- **Los rangos de fecha se calculan en el backend** con `resolverPeriodo`/`periodoAnterior`. La semana empieza el lunes.
-- **Gemini nunca recibe PII ni acceso directo a la BD.** Solo recibe agregados anónimos de los últimos 30 días.
-- **La cola de correos persiste en MySQL.** El worker reintenta automáticamente y recupera jobs interrumpidos al arrancar.
-
----
-
 ## Diagrama de navegación
 
 ```
