@@ -45,11 +45,11 @@ pool.pool.on('connection', (conexion) => {
   conexion.query("SET time_zone = '-05:00'", (err) => {
     if (err) console.error('[db] No se pudo fijar el timezone de sesión:', err.message);
   });
-  // Fuerza utf8mb4_0900_ai_ci en cada conexión para que los parámetros
-  // pasados desde Node coincidan con la colación de las columnas del dump.
-  // Sin esto, Aiven asigna utf8mb4_unicode_ci a los parámetros y los SPs
-  // que comparan VARCHAR lanzan ER_CANT_AGGREGATE_2COLLATIONS.
-  conexion.query("SET NAMES utf8mb4 COLLATE utf8mb4_0900_ai_ci", (err) => {
+  // Todas las tablas del dump tienen COLLATE=utf8mb4_unicode_ci explícito.
+  // El parámetro de un SP sin COLLATE usa collation_connection al momento
+  // del CALL, así que la conexión debe coincidir con las columnas para
+  // evitar ER_CANT_AGGREGATE_2COLLATIONS.
+  conexion.query("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci", (err) => {
     if (err) console.error('[db] No se pudo fijar la colación de sesión:', err.message);
   });
 });
