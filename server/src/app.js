@@ -9,6 +9,10 @@ const { generalLimiter } = require('./middlewares/rateLimiter');
 
 const app = express();
 
+// Render (y otros PaaS) usan un reverse proxy que añade X-Forwarded-For.
+// Sin esto, express-rate-limit no puede identificar IPs reales y lanza warnings.
+app.set('trust proxy', 1);
+
 app.use(helmet());
 app.use(cors({
   origin: config.allowedOrigins,
