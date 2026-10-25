@@ -30,9 +30,9 @@ const pool = mysql.createPool({
   dateStrings: true,
   // Aiven y otros proveedores cloud exigen conexiones SSL. Se activa con
   // DB_SSL=true en el .env del servidor; en local queda deshabilitado.
-  // rejectUnauthorized:true valida el certificado del servidor MySQL para
-  // prevenir ataques MITM sobre la conexión a la base de datos.
-  ...(process.env.DB_SSL === 'true' && { ssl: { rejectUnauthorized: true } }),
+  // rejectUnauthorized:false porque Aiven usa su propia CA que Node.js no
+  // incluye en su store por defecto. La conexión sigue siendo SSL encriptada.
+  ...(process.env.DB_SSL === 'true' && { ssl: { rejectUnauthorized: false } }),
 });
 
 // Fija el timezone de SESIÓN de MySQL en cada nueva conexión del pool.
