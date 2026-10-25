@@ -282,22 +282,40 @@ async function consultarReservaPorToken(tokenClaro, operacion) {
 async function cancelarReserva(tokenClaro) {
   const hash = hashToken(tokenClaro);
 
-  const [resultado] = await pool.query('CALL sp_consumir_token_reserva(?, ?)', [hash, 'cancelar']);
-  const tok = primeraFila(resultado);
-  if (!tok || !tok.id_cita) throw new AppError(await mensajeTokenFallido(hash, 'cancelar'), 410);
+  // La transacción garantiza atomicidad: si sp_cancelar_cita falla (ej: el
+  // trigger bloquea cancelaciones con < 1h de anticipación), el rollback
+  // deja el token sin consumir y el cliente puede reintentar con el mismo enlace.
+  const conexion = await pool.getConnection();
+  let idCita;
 
-  // Cancelar la cita (el trigger valida la ventana de 1 hora)
-  await pool.query('CALL sp_cancelar_cita(?, ?, ?)', [
-    tok.id_cita, 'cliente', 'Cancelado desde enlace de correo',
-  ]);
+  try {
+    await conexion.beginTransaction();
 
-  const [citaResult] = await pool.query('CALL sp_detalle_cita_por_id(?)', [tok.id_cita]);
+    const [resultado] = await conexion.query('CALL sp_consumir_token_reserva(?, ?)', [hash, 'cancelar']);
+    const tok = primeraFila(resultado);
+    if (!tok || !tok.id_cita) throw new AppError(await mensajeTokenFallido(hash, 'cancelar'), 410);
+    idCita = tok.id_cita;
+
+    // El trigger valida la ventana de 1 hora; si lanza SIGNAL se hace rollback
+    await conexion.query('CALL sp_cancelar_cita(?, ?, ?)', [
+      idCita, 'cliente', 'Cancelado desde enlace de correo',
+    ]);
+
+    await conexion.commit();
+  } catch (err) {
+    await conexion.rollback();
+    throw err;
+  } finally {
+    conexion.release();
+  }
+
+  const [citaResult] = await pool.query('CALL sp_detalle_cita_por_id(?)', [idCita]);
   const cita = primeraFila(citaResult);
 
   try {
     await encolarCorreo('cancelacion', { cita });
   } catch (e) {
-    console.error(`[email-queue] No se pudo encolar cancelación — cita ${tok.id_cita}: ${e.constructor.name}`);
+    console.error(`[email-queue] No se pudo encolar cancelación — cita ${idCita}: ${e.constructor.name}`);
   }
 
   return mapearDetalleCita(cita);

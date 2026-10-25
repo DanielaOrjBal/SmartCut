@@ -1,15 +1,15 @@
 /**
- * Tests de las funciones puras de gemini.service.js (Fase 4).
+ * Tests de las funciones puras de gemini.service.js.
  *
- * Solo se prueban `construirInstruccion` y las reglas del prompt:
- * - Solo lectura declarado
- * - Datos del contexto presentes
- * - Nunca llega la GEMINI_API_KEY al cuerpo del prompt
+ * Solo se prueba `construirInstruccionSistema` (antes: construirInstruccion).
+ * La función ya no recibe la pregunta del usuario porque el fix anti-inyección
+ * la separa: instrucción del sistema → config.systemInstruction,
+ * pregunta del usuario → contents. Ambas van a la API por canales distintos.
  *
  * `consultarAsistente` y `obtenerContextoFinanciero` requieren DB + API Key
  * y se cubren con tests de integración por separado.
  */
-const { construirInstruccion } = require('../../src/services/gemini.service');
+const { construirInstruccionSistema } = require('../../src/services/gemini.service');
 
 const contextoCompleto = {
   periodo: 'últimos 30 días',
@@ -31,55 +31,57 @@ const contextoVacio = {
   topCategoriasEgreso: [],
 };
 
-describe('construirInstruccion', () => {
-  test('incluye la pregunta del administrador en el prompt', () => {
-    const prompt = construirInstruccion(contextoCompleto, '¿Cuál barbero facturó más?');
-    expect(prompt).toContain('¿Cuál barbero facturó más?');
+describe('construirInstruccionSistema', () => {
+  test('no incluye input del usuario en la instrucción del sistema (anti-inyección)', () => {
+    // La pregunta viaja en `contents`, nunca en `systemInstruction`.
+    // Si la pregunta apareciese aquí, un admin podría sobrescribir las reglas.
+    const instruccion = construirInstruccionSistema(contextoCompleto);
+    expect(instruccion).not.toContain('¿Cuál barbero facturó más?');
   });
 
   test('declara solo lectura — no puede modificar nada', () => {
-    const prompt = construirInstruccion(contextoCompleto, 'Borra el último movimiento');
-    expect(prompt.toLowerCase()).toContain('solo lectura');
+    const instruccion = construirInstruccionSistema(contextoCompleto);
+    expect(instruccion.toLowerCase()).toContain('solo lectura');
   });
 
   test('incluye cifras del resumen financiero', () => {
-    const prompt = construirInstruccion(contextoCompleto, 'resumen');
+    const instruccion = construirInstruccionSistema(contextoCompleto);
     // Cualquier representación de 500000 (con o sin separador de miles)
-    expect(prompt).toMatch(/500[.,]?000/);
+    expect(instruccion).toMatch(/500[.,]?000/);
   });
 
   test('incluye nombres de barberos del top', () => {
-    const prompt = construirInstruccion(contextoCompleto, 'resumen');
-    expect(prompt).toContain('Sebastian Trujillo');
-    expect(prompt).toContain('Karoll Orjuela');
+    const instruccion = construirInstruccionSistema(contextoCompleto);
+    expect(instruccion).toContain('Sebastian Trujillo');
+    expect(instruccion).toContain('Karoll Orjuela');
   });
 
   test('incluye categorías de egreso', () => {
-    const prompt = construirInstruccion(contextoCompleto, 'gastos');
-    expect(prompt).toContain('Arriendo');
-    expect(prompt).toContain('Servicios públicos');
+    const instruccion = construirInstruccionSistema(contextoCompleto);
+    expect(instruccion).toContain('Arriendo');
+    expect(instruccion).toContain('Servicios públicos');
   });
 
   test('con contexto vacío informa que no hay datos de facturación', () => {
-    const prompt = construirInstruccion(contextoVacio, '¿quién facturó más?');
-    expect(prompt.toLowerCase()).toContain('sin datos');
+    const instruccion = construirInstruccionSistema(contextoVacio);
+    expect(instruccion.toLowerCase()).toContain('sin datos');
   });
 
   test('con egresos vacíos informa que no hay egresos', () => {
-    const prompt = construirInstruccion(contextoVacio, '¿cuáles son los gastos?');
-    expect(prompt.toLowerCase()).toContain('sin egresos');
+    const instruccion = construirInstruccionSistema(contextoVacio);
+    expect(instruccion.toLowerCase()).toContain('sin egresos');
   });
 
   test('nunca contiene la clave de API', () => {
     // Garantía de que GEMINI_API_KEY no se filtra al prompt bajo ninguna circunstancia.
     process.env.GEMINI_API_KEY = 'clave-ultra-secreta-de-prueba';
-    const prompt = construirInstruccion(contextoCompleto, 'cualquier pregunta');
-    expect(prompt).not.toContain('clave-ultra-secreta-de-prueba');
+    const instruccion = construirInstruccionSistema(contextoCompleto);
+    expect(instruccion).not.toContain('clave-ultra-secreta-de-prueba');
     delete process.env.GEMINI_API_KEY;
   });
 
   test('indica que responde en español', () => {
-    const prompt = construirInstruccion(contextoCompleto, 'pregunta');
-    expect(prompt.toLowerCase()).toContain('español');
+    const instruccion = construirInstruccionSistema(contextoCompleto);
+    expect(instruccion.toLowerCase()).toContain('español');
   });
 });

@@ -101,8 +101,52 @@ export function LandingPage() {
         </div>
       </main>
 
-      <footer className="bg-gray-900 text-gray-500 text-xs text-center py-6 px-4">
-        © {new Date().getFullYear()} SmartCut · Todos los derechos reservados
+      <footer className="bg-gray-900 text-gray-400 text-xs py-10 px-4">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+          <p className="text-gray-500">© {new Date().getFullYear()} SmartCut · Todos los derechos reservados</p>
+
+          <div className="flex flex-wrap items-center justify-center gap-5">
+            <a
+              href="https://www.instagram.com/Smartcut26"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 hover:text-white transition-colors"
+              aria-label="Instagram de SmartCut"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <circle cx="12" cy="12" r="4"/>
+                <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
+              </svg>
+              @Smartcut26
+            </a>
+
+            <a
+              href="https://www.facebook.com/Smartcut"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 hover:text-white transition-colors"
+              aria-label="Facebook de SmartCut"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+              </svg>
+              Smartcut
+            </a>
+
+            <a
+              href="mailto:smartcut828@gmail.com"
+              className="flex items-center gap-1.5 hover:text-white transition-colors"
+              aria-label="Correo de SmartCut"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+              </svg>
+              smartcut828@gmail.com
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   );

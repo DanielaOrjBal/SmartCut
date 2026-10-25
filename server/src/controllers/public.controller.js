@@ -123,13 +123,27 @@ async function crearReserva(req, res) {
         409,
       );
     }
-    const nuevo = await svc.crearCliente({
-      nombre: body.nombre,
-      apellido: body.apellido,
-      correo: body.correo,
-      telefono: body.telefono,
-    });
-    idCliente = nuevo.idCliente;
+
+    try {
+      const nuevo = await svc.crearCliente({
+        nombre: body.nombre,
+        apellido: body.apellido,
+        correo: body.correo,
+        telefono: body.telefono,
+      });
+      idCliente = nuevo.idCliente;
+    } catch (err) {
+      // Race condition: dos peticiones con el mismo correo nuevo llegaron en
+      // paralelo; la segunda llega aquí con ER_DUP_ENTRY porque la primera ya
+      // insertó el cliente. Se resuelve leyendo el cliente recién creado.
+      if (err.code === 'ER_DUP_ENTRY' || err.errno === 1062) {
+        const repetido = await svc.buscarClientePorCorreo(body.correo);
+        if (!repetido) throw new AppError('Error inesperado al procesar el cliente.', 500);
+        idCliente = repetido.idCliente;
+      } else {
+        throw err;
+      }
+    }
   }
 
   const reserva = await svc.crearReserva({

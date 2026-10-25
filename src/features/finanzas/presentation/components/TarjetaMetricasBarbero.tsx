@@ -48,10 +48,6 @@ export function TarjetaMetricasBarbero({ datos, esAdmin = false }: Props) {
           valor={formatearCOP(resumen.comision)}
           colorValor="#16A34A"
         />
-        <FilaMetrica
-          etiqueta="Ticket prom."
-          valor={formatearCOP(resumen.ticketPromedio)}
-        />
       </View>
 
       {/* Medios de pago */}

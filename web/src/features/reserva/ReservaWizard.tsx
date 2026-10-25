@@ -71,7 +71,7 @@ function WizardInner() {
         <ProgressBar pasoActual={paso} />
 
         <div className="flex flex-col md:flex-row gap-8">
-          <div ref={stepRef} tabIndex={-1} className="flex-1 min-w-0 outline-none">
+          <div ref={stepRef} tabIndex={-1} className="flex-1 min-w-0 max-w-xl outline-none">
             {paso === 1 && <StepCliente onSiguiente={siguiente} />}
             {paso === 2 && (
               <StepBarberia onSiguiente={siguiente} onAnterior={anterior} />

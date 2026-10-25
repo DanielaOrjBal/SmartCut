@@ -2,11 +2,7 @@ const { pool } = require('../config/db');
 const { config } = require('../config/env');
 const { obtenerClienteGemini } = require('../config/gemini');
 const { AppError } = require('../utils/AppError');
-
-function numero(valor) {
-  const convertido = Number(valor);
-  return Number.isFinite(convertido) ? convertido : 0;
-}
+const { numero } = require('../utils/numero');
 
 function resultadoSet(resultado, indice) {
   return Array.isArray(resultado?.[indice]) ? resultado[indice] : [];
@@ -49,7 +45,13 @@ async function obtenerContextoFinanciero(idBarberia) {
   };
 }
 
-function construirInstruccion(contexto, pregunta) {
+/**
+ * Construye la instrucción del sistema (sin la pregunta del usuario).
+ * Separar la instrucción del contenido del usuario previene la inyección de
+ * prompt: el modelo recibe cada parte por canales distintos de la API y no
+ * puede confundirlas.
+ */
+function construirInstruccionSistema(contexto) {
   const barberos =
     contexto.topBarberos.length === 0
       ? 'Sin datos de facturación por barbero.'
@@ -81,9 +83,7 @@ Top 3 barberos por facturación:
 ${barberos}
 
 Top 3 categorías de egreso:
-${categorias}
-
-Pregunta del administrador: ${pregunta}`;
+${categorias}`;
 }
 
 function conTimeout(promesa, milisegundos) {
@@ -109,7 +109,6 @@ async function llamarConReintento(cliente, params, timeoutMs) {
   } catch (primerError) {
     console.error(`[gemini] Primer intento fallido: ${primerError.constructor.name}. Reintentando en 2s…`);
     await new Promise((resolver) => setTimeout(resolver, 2000));
-    // El segundo intento se propaga sin capturar: lo maneja consultarAsistente
     return await conTimeout(cliente.models.generateContent(params), timeoutMs);
   }
 }
@@ -122,7 +121,14 @@ async function consultarAsistente({ idBarberia, pregunta }) {
   try {
     interaccion = await llamarConReintento(
       cliente,
-      { model: config.gemini.model, contents: construirInstruccion(contexto, pregunta) },
+      {
+        model: config.gemini.model,
+        // systemInstruction y contents son canales separados en la API:
+        // el modelo no puede confundir las instrucciones del sistema con el
+        // input del usuario, lo que elimina el vector de inyección de prompt.
+        config: { systemInstruction: construirInstruccionSistema(contexto) },
+        contents: pregunta,
+      },
       config.gemini.timeoutMs,
     );
   } catch (error) {
@@ -138,4 +144,4 @@ async function consultarAsistente({ idBarberia, pregunta }) {
   return { respuesta };
 }
 
-module.exports = { consultarAsistente, obtenerContextoFinanciero, construirInstruccion };
+module.exports = { consultarAsistente, construirInstruccionSistema };

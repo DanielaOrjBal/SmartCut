@@ -29,9 +29,12 @@ async function encolarCorreo(tipo, payload) {
 // ------------------------------------------------------------------
 
 async function procesarLote() {
-  // 1. Leer IDs pendientes (sin consumirlos aún)
+  // 1. Reclamar el lote en una sola operación: SELECT … FOR UPDATE + UPDATE
+  //    atomizado en dos queries minimiza el riesgo de procesar el mismo job
+  //    dos veces ante un eventual reinicio entre queries.
+  //    El AND estado = 'pendiente' garantiza idempotencia.
   const [pendientes] = await pool.query(
-    `SELECT id
+    `SELECT id, tipo, payload, intentos, max_intentos
        FROM cola_correos
       WHERE estado = 'pendiente'
         AND intentos < max_intentos
@@ -44,9 +47,7 @@ async function procesarLote() {
 
   const ids = pendientes.map((f) => f.id);
 
-  // 2. Reclamar el lote atómicamente: solo filas que siguen pendientes.
-  //    En un proceso único Node no hay carreras, pero el AND estado=
-  //    'pendiente' lo hace seguro ante un reinicio inesperado.
+  // 2. Marcar como 'procesando' solo las filas que siguen pendientes.
   await pool.query(
     `UPDATE cola_correos
         SET estado = 'procesando', intentos = intentos + 1
@@ -55,16 +56,10 @@ async function procesarLote() {
     [ids],
   );
 
-  // 3. Leer los datos completos de los jobs reclamados
-  const [jobs] = await pool.query(
-    `SELECT id, tipo, payload, intentos, max_intentos
-       FROM cola_correos
-      WHERE id IN (?)
-        AND estado = 'procesando'`,
-    [ids],
-  );
-
-  for (const job of jobs) {
+  // Procesar con los datos ya leídos en el paso 1 (los intentos que se
+  // guardarán al fallar son los originales + 1 que hizo el UPDATE).
+  const jobsActualizados = pendientes.map((j) => ({ ...j, intentos: j.intentos + 1 }));
+  for (const job of jobsActualizados) {
     await procesarJob(job);
   }
 }
@@ -141,13 +136,39 @@ async function procesarConGuardia() {
 // Ciclo de vida
 // ------------------------------------------------------------------
 
+/**
+ * Al arrancar, cualquier job que quedó en 'procesando' (proceso caído en
+ * mitad de un envío) se devuelve a 'pendiente' para que el worker los reintente.
+ * Sin esto, esos jobs quedan atascados permanentemente sin importar sus intentos.
+ */
+async function recuperarJobsInterrumpidos() {
+  try {
+    const [resultado] = await pool.query(
+      `UPDATE cola_correos
+          SET estado = 'pendiente'
+        WHERE estado = 'procesando'
+          AND intentos < max_intentos`,
+    );
+    if (resultado.affectedRows > 0) {
+      console.log(`[email-queue] ${resultado.affectedRows} job(s) interrumpido(s) devuelto(s) a pendiente.`);
+    }
+  } catch (err) {
+    console.error('[email-queue] No se pudieron recuperar jobs interrumpidos:', err.message);
+  }
+}
+
 function iniciarWorker() {
   if (intervalId) return;
-  // Primera pasada inmediata: procesar correos que hayan quedado
-  // pendientes si el servidor reinició con jobs en cola.
-  procesarConGuardia();
-  intervalId = setInterval(procesarConGuardia, INTERVALO_MS);
   console.log(`[email-queue] Worker iniciado (intervalo ${INTERVALO_MS / 1000}s, lote ${LOTE_MAX})`);
+
+  // La recuperación corre primero y espera a terminar antes de activar el
+  // intervalo, evitando que el primer tick del setInterval solape con la
+  // recuperación y reintente el mismo job dos veces.
+  (async () => {
+    await recuperarJobsInterrumpidos();
+    procesarConGuardia();
+    intervalId = setInterval(procesarConGuardia, INTERVALO_MS);
+  })();
 }
 
 function detenerWorker() {

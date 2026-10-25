@@ -28,6 +28,11 @@ const pool = mysql.createPool({
   // serializarse a JSON, viaja en UTC como el día anterior. La app necesita la
   // fecha calendario exacta que devolvió la base, no un instante.
   dateStrings: true,
+  // Aiven y otros proveedores cloud exigen conexiones SSL. Se activa con
+  // DB_SSL=true en el .env del servidor; en local queda deshabilitado.
+  // rejectUnauthorized:true valida el certificado del servidor MySQL para
+  // prevenir ataques MITM sobre la conexión a la base de datos.
+  ...(process.env.DB_SSL === 'true' && { ssl: { rejectUnauthorized: true } }),
 });
 
 // Fija el timezone de SESIÓN de MySQL en cada nueva conexión del pool.
@@ -37,7 +42,11 @@ const pool = mysql.createPool({
 // fecha del día siguiente, y al abrir la app la mañana siguiente aparecería
 // "Cerrada" en lugar de "Sin abrir".
 pool.pool.on('connection', (conexion) => {
-  conexion.query("SET time_zone = '-05:00'");
+  conexion.query("SET time_zone = '-05:00'", (err) => {
+    if (err) {
+      console.error('[db] No se pudo fijar el timezone de sesión:', err.message);
+    }
+  });
 });
 
 /**

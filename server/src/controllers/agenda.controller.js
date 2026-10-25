@@ -57,6 +57,8 @@ async function registrarAtencion(req, res) {
  * sea admin o no.
  */
 async function cambiarEstadoCita(req, res) {
+  // req.body fue reemplazado por el middleware validar() con el objeto ya
+  // parseado y validado (incluido el .refine que exige medioPago para 'finalizada').
   const { estado, fecha, motivo, medioPago } = req.body;
 
   const cita = await agendaService.buscarCitaDelDia({

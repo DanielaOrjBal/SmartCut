@@ -13,10 +13,14 @@ const app = require('./app');
 async function arrancar() {
   const faltantes = validarConfig();
   if (faltantes.length > 0) {
-    console.warn(
-      `⚠️  Falta configurar en server/.env: ${faltantes.join(', ')}. ` +
-        'Copia server/.env.example como server/.env y llénalo.',
+    // Sin JWT_SECRET el servidor firmaría tokens con secreto vacío, lo que
+    // permite a cualquiera forjar sesiones de administrador. Se aborta el
+    // arranque en lugar de continuar en un estado inseguro.
+    console.error(
+      `❌ Variables de entorno requeridas no configuradas: ${faltantes.join(', ')}.\n` +
+        '   Copia server/.env.example como server/.env y llénalo antes de arrancar.',
     );
+    process.exit(1);
   }
 
   try {

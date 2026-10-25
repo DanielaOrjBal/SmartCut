@@ -67,7 +67,7 @@ function errorHandler(err, req, res, next) {
 
 /** Se monta después de todas las rutas: lo que llegue aquí no existe. */
 function noEncontrado(req, res) {
-  res.status(404).json({ mensaje: `No existe la ruta ${req.method} ${req.originalUrl}` });
+  res.status(404).json({ mensaje: 'Ruta no encontrada.' });
 }
 
 module.exports = { errorHandler, noEncontrado };

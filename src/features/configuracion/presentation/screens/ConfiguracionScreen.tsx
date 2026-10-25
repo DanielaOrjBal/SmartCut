@@ -103,9 +103,6 @@ export function ConfiguracionScreen({ navigation }: AppDrawerScreenProps<'Config
                       <Dato etiqueta="Nombre" valor={barberia.data.nombre} />
                       <Dato etiqueta="Dirección" valor={barberia.data.direccion ?? 'Sin registrar'} />
                       <Dato etiqueta="Teléfono" valor={barberia.data.telefono ?? 'Sin registrar'} />
-                      <Text style={estilos.notaSoloLectura}>
-                        Estos datos son de solo lectura por ahora.
-                      </Text>
                     </>
                   ) : null}
                 </Seccion>
@@ -148,7 +145,7 @@ function Dato({ etiqueta, valor }: { etiqueta: string; valor: string }) {
   return (
     <View style={estilos.fila}>
       <Text style={estilos.etiqueta}>{etiqueta}</Text>
-      <Text style={estilos.valor} numberOfLines={1}>
+      <Text style={estilos.valor} numberOfLines={2}>
         {valor}
       </Text>
     </View>

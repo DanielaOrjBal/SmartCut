@@ -1,7 +1,7 @@
 const { pool } = require('../config/db');
 const { primeraFila, filas, oNulo } = require('../utils/sp');
-const { aISO } = require('../utils/periodo');
-const { resolverPeriodo } = require('../utils/periodo');
+const { aISO, resolverPeriodo } = require('../utils/periodo');
+const { numero } = require('../utils/numero');
 
 /**
  * 'YYYY-MM-DD' de hoy en hora Bogotá.
@@ -10,11 +10,6 @@ const { resolverPeriodo } = require('../utils/periodo');
  */
 function hoyBogota() {
   return aISO(new Date());
-}
-
-function numero(valor) {
-  const n = Number(valor);
-  return Number.isNaN(n) ? 0 : n;
 }
 
 function mapearCaja(fila) {
@@ -38,22 +33,15 @@ function mapearCaja(fila) {
 }
 
 function mapearDesglose(fila) {
-  const ingEfectivo = numero(fila?.ing_efectivo);
-  const ingTarjeta = numero(fila?.ing_tarjeta);
-  const ingNequi = numero(fila?.ing_nequi);
-  const ingPse = numero(fila?.ing_pse);
-  const ingBreB = numero(fila?.ing_bre_b);
-  const totalIngresos = numero(fila?.total_ingresos);
-  const totalEgresos = numero(fila?.total_egresos);
-
   return {
-    ingEfectivo,
-    ingTarjeta,
-    ingNequi,
-    ingPse,
-    ingBreB,
-    totalIngresos,
-    totalEgresos,
+    ingEfectivo: numero(fila?.ing_efectivo),
+    ingTarjeta: numero(fila?.ing_tarjeta),
+    ingNequi: numero(fila?.ing_nequi),
+    ingPse: numero(fila?.ing_pse),
+    ingBreB: numero(fila?.ing_bre_b),
+    totalIngresos: numero(fila?.total_ingresos),
+    totalEgresos: numero(fila?.total_egresos),
+    egrEfectivo: numero(fila?.egr_efectivo),
   };
 }
 
@@ -102,11 +90,13 @@ async function estadoCajaHoy({ idBarberia }) {
   const caja = mapearCaja(cajaFila);
   const desglose = mapearDesglose(desgloseFila);
 
-  // Saldo esperado en efectivo = fondo_inicial + ingresos_efectivo - egresos
-  // Solo calculable si hay caja abierta
+  // Saldo esperado en efectivo = fondo_inicial + ingresos_efectivo - egresos_efectivo.
+  // Se usa egrEfectivo (solo egresos pagados en efectivo) para no descontar
+  // salidas por tarjeta o digital que nunca salieron del cajón físico.
+  // Solo calculable si hay caja abierta.
   const saldoEsperadoEfectivo =
     caja !== null
-      ? caja.montoApertura + desglose.ingEfectivo - desglose.totalEgresos
+      ? caja.montoApertura + desglose.ingEfectivo - desglose.egrEfectivo
       : null;
 
   return { fecha, caja, desglose, saldoEsperadoEfectivo };
