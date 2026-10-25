@@ -35,4 +35,13 @@ async function listarServicios(req, res) {
   res.json({ servicios });
 }
 
-module.exports = { resumenBarbero, resumenBarberia, obtenerPerfil, listarServicios };
+/** PATCH /api/dashboard/perfil — requiere JWT */
+async function actualizarPerfil(req, res) {
+  const perfilActualizado = await dashboardService.actualizarPerfil({
+    idBarbero: req.usuario.idBarbero,
+    ...req.body,
+  });
+  res.json({ perfil: perfilActualizado });
+}
+
+module.exports = { resumenBarbero, resumenBarberia, obtenerPerfil, listarServicios, actualizarPerfil };

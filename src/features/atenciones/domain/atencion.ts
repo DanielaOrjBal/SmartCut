@@ -1,6 +1,9 @@
+import type { MedioPago } from '../../../core/components/SelectorMedioPago';
+
 export type NuevaAtencion = {
   nombreCliente: string;
   servicios: number[];
+  medioPago: MedioPago;
 };
 
 /**

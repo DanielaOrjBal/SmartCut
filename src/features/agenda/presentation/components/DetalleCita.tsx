@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -21,6 +22,10 @@ import {
 import { formStyles } from '../../../../core/theme/formStyles';
 import { formatearCOP } from '../../../../core/utils/moneda';
 import { formatearFechaLarga, formatearHora } from '../../../../core/utils/fechas';
+import {
+  SelectorMedioPago,
+  type MedioPago,
+} from '../../../../core/components/SelectorMedioPago';
 import { useCambiarEstadoCita } from '../hooks/useCambiarEstadoCita';
 import { TRANSICIONES_CITA, ETIQUETA_ACCION_CITA, type Cita, type EstadoCita } from '../../domain/agenda';
 
@@ -43,10 +48,14 @@ type Props = {
 export function DetalleCita({ cita, puedeActuar, onClose, onCambiado }: Props) {
   const mutacion = useCambiarEstadoCita();
   const [motivo, setMotivo] = useState('');
+  const [medioPago, setMedioPago] = useState<MedioPago | null>(null);
+  const [intentoFinalizar, setIntentoFinalizar] = useState(false);
 
   useEffect(() => {
     if (cita !== null) {
       setMotivo('');
+      setMedioPago(null);
+      setIntentoFinalizar(false);
       mutacion.limpiarError();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -62,12 +71,17 @@ export function DetalleCita({ cita, puedeActuar, onClose, onCambiado }: Props) {
     if (cita === null) {
       return;
     }
+    if (destino === 'finalizada' && medioPago === null) {
+      setIntentoFinalizar(true);
+      return;
+    }
     try {
       await mutacion.ejecutar({
         idCita: cita.idCita,
         estado: destino,
         fecha: cita.fecha,
         motivo: destino === 'cancelada' && motivo.trim().length > 0 ? motivo.trim() : undefined,
+        medioPago: destino === 'finalizada' ? medioPago! : undefined,
       });
       onCambiado();
       onClose();
@@ -79,7 +93,11 @@ export function DetalleCita({ cita, puedeActuar, onClose, onCambiado }: Props) {
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
       <View style={estilos.fondo}>
-        <View style={estilos.hoja}>
+        <ScrollView
+          style={estilos.hoja}
+          contentContainerStyle={estilos.hojaContenido}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={estilos.encabezado}>
             <Text style={estilos.titulo}>Ticket {cita.numeroTicket}</Text>
             <TouchableOpacity onPress={onClose} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
@@ -130,6 +148,16 @@ export function DetalleCita({ cita, puedeActuar, onClose, onCambiado }: Props) {
                 />
               )}
 
+              {transiciones.includes('finalizada') && (
+                <View style={estilos.selectorPago}>
+                  <SelectorMedioPago
+                    valor={medioPago}
+                    onCambiar={setMedioPago}
+                    conError={intentoFinalizar && medioPago === null}
+                  />
+                </View>
+              )}
+
               {mutacion.error !== null && (
                 <Text style={[formStyles.mensajeError, estilos.error]}>{mutacion.error}</Text>
               )}
@@ -176,7 +204,7 @@ export function DetalleCita({ cita, puedeActuar, onClose, onCambiado }: Props) {
               </View>
             </>
           )}
-        </View>
+        </ScrollView>
       </View>
     </Modal>
   );
@@ -201,6 +229,9 @@ const estilos = StyleSheet.create({
     backgroundColor: colors.background,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
+    maxHeight: '88%',
+  },
+  hojaContenido: {
     padding: spacing.screen,
     paddingBottom: spacing.xl,
   },
@@ -269,6 +300,7 @@ const estilos = StyleSheet.create({
     marginLeft: spacing.sm,
   },
   motivo: { marginBottom: spacing.md },
+  selectorPago: { marginBottom: spacing.md },
   error: { marginBottom: spacing.sm },
   acciones: {
     flexDirection: 'row',

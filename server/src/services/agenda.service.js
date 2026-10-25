@@ -67,17 +67,18 @@ async function buscarCitaDelDia({ idBarberia, idBarbero, idCita, fecha }) {
  *
  * `sp_registrar_atencion` hace todo dentro de la base — crea el cliente, la
  * cita, sus servicios y la deja finalizada, lo que dispara
- * `trg_cita_finalizada_genera_ingreso` y con él el movimiento con su comisión.
- * Aquí no se calcula ni un peso.
+ * `trg_cita_finalizada_genera_ingreso` y con él el movimiento con su comisión
+ * y el medio de pago indicado.
  */
-async function registrarAtencion({ idBarbero, nombreCliente, servicios }) {
+async function registrarAtencion({ idBarbero, nombreCliente, servicios, medioPago }) {
   // FIND_IN_SET espera 'id,id,id'. Los ids ya vienen validados como enteros.
   const csv = servicios.join(',');
 
-  const [resultado] = await pool.query('CALL sp_registrar_atencion(?, ?, ?)', [
+  const [resultado] = await pool.query('CALL sp_registrar_atencion(?, ?, ?, ?)', [
     idBarbero,
     nombreCliente,
     csv,
+    medioPago,
   ]);
 
   const fila = primeraFila(resultado);
@@ -102,14 +103,15 @@ async function registrarAtencion({ idBarbero, nombreCliente, servicios }) {
  *
  * Las consecuencias financieras NO se tocan desde aquí:
  *  - 'finalizada' hace que `trg_cita_finalizada_genera_ingreso` cree el ingreso
- *    con su comisión.
+ *    con su comisión y el medio de pago. El SP escribe medioPago en cita antes
+ *    del UPDATE que dispara el trigger.
  *  - 'cancelada' y 'no_asistio' hacen que `trg_cita_no_atendida_anula_ingreso`
  *    anule el movimiento asociado. No suma ni resta.
  *
  * Cancelar pasa por `sp_cancelar_cita` y no por `sp_actualizar_estado_cita`
  * porque solo el primero registra quién canceló y por qué.
  */
-async function cambiarEstadoCita({ cita, estado, motivo, esAdmin }) {
+async function cambiarEstadoCita({ cita, estado, motivo, medioPago, esAdmin }) {
   if (cita.estado === estado) {
     throw new AppError('La cita ya está en ese estado.', 400);
   }
@@ -123,14 +125,19 @@ async function cambiarEstadoCita({ cita, estado, motivo, esAdmin }) {
       motivo ?? null,
     ]);
   } else {
-    await pool.query('CALL sp_actualizar_estado_cita(?, ?)', [cita.idCita, estado]);
+    // medioPago llega null para estados que no sean 'finalizada'; el SP
+    // solo lo escribe cuando p_nuevo_estado = 'finalizada'.
+    await pool.query('CALL sp_actualizar_estado_cita(?, ?, ?)', [
+      cita.idCita,
+      estado,
+      medioPago ?? null,
+    ]);
   }
 
   return { ...cita, estado };
 }
 
 module.exports = {
-  mapearCita,
   listarAgenda,
   buscarCitaDelDia,
   registrarAtencion,

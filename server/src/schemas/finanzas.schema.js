@@ -91,7 +91,6 @@ const informeQuerySchema = z.object({
 });
 
 module.exports = {
-  tipoMovimiento,
   resumenQuerySchema,
   serieQuerySchema,
   movimientosQuerySchema,

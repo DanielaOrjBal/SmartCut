@@ -6,24 +6,27 @@ import { PERIODOS, type Periodo } from '../utils/fechas';
 type Props = {
   valor: Periodo;
   onCambiar: (periodo: Periodo) => void;
+  /** Lista personalizada de opciones. Si se omite, se usan los cinco períodos globales. */
+  opciones?: ReadonlyArray<{ valor: Periodo; etiqueta: string }>;
+  centrado?:boolean;
 };
 
 /**
- * Día / Semana / Mes / Trimestre / Año, en una fila de píldoras.
- *
- * Componente único reutilizado en Inicio del administrador, Agenda y
- * Finanzas: cambiar de período aquí siempre dispara una nueva petición al
- * backend (los rangos los calcula el servidor), nunca un filtrado en el
- * cliente sobre datos ya cargados.
+ * Fila de píldoras de período. Reutilizado en Inicio, Agenda y Finanzas.
+ * Finanzas pasa `opciones={PERIODOS_FINANZAS}` para mostrar solo Mes/Trimestre/Año.
  */
-export function SelectorPeriodo({ valor, onCambiar }: Props) {
+export function SelectorPeriodo({ valor, onCambiar, opciones, centrado = false }: Props) {
+  const lista = opciones ?? PERIODOS;
   return (
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={estilos.contenedor}
+      contentContainerStyle={[
+        estilos.contenedor, 
+        centrado && estilos.contenedorCentrado,
+      ]}
     >
-      {PERIODOS.map((opcion) => {
+      {lista.map((opcion) => {
         const activo = opcion.valor === valor;
         return (
           <TouchableOpacity
@@ -45,6 +48,10 @@ export function SelectorPeriodo({ valor, onCambiar }: Props) {
 const estilos = StyleSheet.create({
   contenedor: {
     paddingVertical: spacing.xs,
+  },
+  contenedorCentrado:{
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   pildora: {
     paddingVertical: 8,

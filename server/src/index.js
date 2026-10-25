@@ -5,33 +5,22 @@
 // asignadas a la fecha equivocada.
 process.env.TZ = 'America/Bogota';
 
-const express = require('express');
-const cors = require('cors');
-
 const { config, validarConfig } = require('./config/env');
 const { probarConexion } = require('./config/db');
-const rutas = require('./routes');
-const { errorHandler, noEncontrado } = require('./middlewares/errorHandler');
-
-const app = express();
-
-// La app móvil corre en otro origen (Expo Go / emulador), así que CORS abierto.
-// Es una API de proyecto universitario, no hay cookies ni sesiones de navegador.
-app.use(cors());
-app.use(express.json({ limit: '1mb' }));
-
-app.use('/api', rutas);
-
-app.use(noEncontrado);
-app.use(errorHandler);
+const { iniciarWorker, detenerWorker } = require('./queues/emailQueue');
+const app = require('./app');
 
 async function arrancar() {
   const faltantes = validarConfig();
   if (faltantes.length > 0) {
-    console.warn(
-      `⚠️  Falta configurar en server/.env: ${faltantes.join(', ')}. ` +
-        'Copia server/.env.example como server/.env y llénalo.',
+    // Sin JWT_SECRET el servidor firmaría tokens con secreto vacío, lo que
+    // permite a cualquiera forjar sesiones de administrador. Se aborta el
+    // arranque en lugar de continuar en un estado inseguro.
+    console.error(
+      `❌ Variables de entorno requeridas no configuradas: ${faltantes.join(', ')}.\n` +
+        '   Copia server/.env.example como server/.env y llénalo antes de arrancar.',
     );
+    process.exit(1);
   }
 
   try {
@@ -54,6 +43,12 @@ async function arrancar() {
     console.log(`🚀 API de SmartCut escuchando en http://localhost:${config.port}/api`);
     console.log(`   Prueba de vida: http://localhost:${config.port}/api/salud`);
   });
+
+  iniciarWorker();
+
+  // Apagado limpio: detener el worker antes de que el proceso termine.
+  process.once('SIGTERM', detenerWorker);
+  process.once('SIGINT', detenerWorker);
 }
 
 arrancar();

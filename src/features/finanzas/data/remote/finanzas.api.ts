@@ -2,9 +2,9 @@ import { apiClient } from '../../../../core/api/client';
 import { construirQuery } from '../../../../core/utils/query';
 import type {
   Categoria,
-  EgresosPorCategoriaResultado,
   GastoMensual,
   InformeMensual,
+  MetricasBarbero,
   Movimiento,
   MovimientosResultado,
   NuevoMovimiento,
@@ -61,12 +61,6 @@ export function obtenerGastosAnuales(): Promise<{ meses: GastoMensual[] }> {
   return apiClient.get('/finanzas/gastos-anuales');
 }
 
-/** GET /api/finanzas/egresos-categoria — solo admin. */
-export function obtenerEgresosPorCategoria(
-  parametros: ParametrosPeriodo,
-): Promise<EgresosPorCategoriaResultado> {
-  return apiClient.get(`/finanzas/egresos-categoria${queryPeriodo(parametros)}`);
-}
 
 /** GET /api/finanzas/movimientos — solo admin, filtrable por tipo. */
 export function listarMovimientos(
@@ -126,4 +120,17 @@ export function crearCategoria(datos: {
 /** GET /api/finanzas/informe?anio&mes — solo admin. Datos para el PDF con expo-print. */
 export function obtenerInformeMensual(anio: number, mes: number): Promise<{ informe: InformeMensual }> {
   return apiClient.get(`/finanzas/informe${construirQuery({ anio, mes })}`);
+}
+
+/** GET /api/finanzas/mis-metricas — barbero en sesión (o admin con su propio id). */
+export function obtenerMisMetricas(parametros: ParametrosPeriodo): Promise<MetricasBarbero> {
+  return apiClient.get(`/finanzas/mis-metricas${queryPeriodo(parametros)}`);
+}
+
+/** GET /api/finanzas/barbero/:id/metricas — solo admin. */
+export function obtenerMetricasBarbero(
+  idBarbero: number,
+  parametros: ParametrosPeriodo,
+): Promise<MetricasBarbero> {
+  return apiClient.get(`/finanzas/barbero/${idBarbero}/metricas${queryPeriodo(parametros)}`);
 }

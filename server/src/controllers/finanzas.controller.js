@@ -155,6 +155,42 @@ async function informeMensual(req, res) {
   res.json({ informe });
 }
 
+/**
+ * GET /api/finanzas/mis-metricas?periodo — requiere JWT (barbero o admin)
+ *
+ * El barbero solo ve sus propias métricas; un admin que llame a esta ruta
+ * también recibe las suyas (aunque probablemente prefiera la ruta /:id).
+ */
+async function misMetricas(req, res) {
+  const { periodo, desde, hasta } = req.queryValidada;
+  const datos = await finanzasService.metricasBarbero({
+    idBarberia: req.usuario.idBarberia,
+    idBarbero: req.usuario.idBarbero,
+    periodo,
+    desde,
+    hasta,
+  });
+  res.json(datos);
+}
+
+/**
+ * GET /api/finanzas/barbero/:id/metricas?periodo — JWT + soloAdmin
+ *
+ * El admin puede ver las métricas de cualquier barbero de su barbería.
+ * La pertenencia la garantiza el SP (filtra por barberia_id).
+ */
+async function metricasBarbero(req, res) {
+  const { periodo, desde, hasta } = req.queryValidada;
+  const datos = await finanzasService.metricasBarbero({
+    idBarberia: req.usuario.idBarberia,
+    idBarbero: req.params.id,
+    periodo,
+    desde,
+    hasta,
+  });
+  res.json(datos);
+}
+
 module.exports = {
   resumen,
   serie,
@@ -168,4 +204,6 @@ module.exports = {
   listarCategorias,
   crearCategoria,
   informeMensual,
+  misMetricas,
+  metricasBarbero,
 };

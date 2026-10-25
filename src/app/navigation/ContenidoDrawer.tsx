@@ -19,17 +19,16 @@ const ITEMS_BARBERO: ItemMenu[] = [
   { ruta: 'Inicio', etiqueta: 'Inicio', icono: 'home' },
   { ruta: 'Agenda', etiqueta: 'Agenda', icono: 'calendar' },
   { ruta: 'Finanzas', etiqueta: 'Finanzas', icono: 'dollar-sign' },
-  { ruta: 'Publicaciones', etiqueta: 'Publicaciones', icono: 'globe' },
   { ruta: 'Configuracion', etiqueta: 'Configuración', icono: 'settings' },
 ];
 
-/** Equipo entre Agenda y Finanzas: es la sección propia de gestión del negocio. */
+/** Equipo y Asistente son exclusivos del admin; Equipo entre Agenda y Finanzas. */
 const ITEMS_ADMIN: ItemMenu[] = [
   { ruta: 'Inicio', etiqueta: 'Inicio', icono: 'home' },
   { ruta: 'Agenda', etiqueta: 'Agenda', icono: 'calendar' },
   { ruta: 'Equipo', etiqueta: 'Equipo', icono: 'users' },
   { ruta: 'Finanzas', etiqueta: 'Finanzas', icono: 'dollar-sign' },
-  { ruta: 'Publicaciones', etiqueta: 'Publicaciones', icono: 'globe' },
+  { ruta: 'Asistente', etiqueta: 'Asistente IA', icono: 'cpu' },
   { ruta: 'Configuracion', etiqueta: 'Configuración', icono: 'settings' },
 ];
 

@@ -17,6 +17,33 @@ const config = {
     secret: process.env.JWT_SECRET || '',
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY || '',
+    // Se mantiene configurable para cambiar de modelo sin desplegar código.
+    model: process.env.GEMINI_MODEL || 'gemini-2.0-flash',
+    timeoutMs: Number(process.env.GEMINI_TIMEOUT_MS) || 15_000,
+  },
+  googlePlaces: {
+    apiKey: process.env.GOOGLE_PLACES_KEY || '',
+  },
+  smtp: {
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === 'true',
+    user: process.env.SMTP_USER || '',
+    pass: process.env.SMTP_PASS || '',
+    from: process.env.EMAIL_FROM || 'SmartCut <reservas@smartcut.co>',
+  },
+  web: {
+    // URL base de la web pública (para generar los enlaces de cancelar/reprogramar)
+    baseUrl: process.env.WEB_BASE_URL || 'http://localhost:5173',
+  },
+  // Orígenes permitidos en CORS. En .env se separan por coma:
+  // ALLOWED_ORIGINS=http://localhost:5173,exp://192.168.1.10:8081
+  allowedOrigins: (process.env.ALLOWED_ORIGINS || 'http://localhost:5173')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean),
 };
 
 /**
@@ -28,6 +55,8 @@ function validarConfig() {
   const faltantes = [];
   if (!process.env.JWT_SECRET) faltantes.push('JWT_SECRET');
   if (!process.env.DB_NAME) faltantes.push('DB_NAME');
+  if (!process.env.SMTP_USER) faltantes.push('SMTP_USER');
+  if (!process.env.SMTP_PASS) faltantes.push('SMTP_PASS');
   return faltantes;
 }
 

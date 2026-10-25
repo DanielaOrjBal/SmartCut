@@ -13,18 +13,14 @@ import { useAuth } from '../../../auth/presentation/context/AuthContext';
 import { usePerfil } from '../../../dashboard/presentation/hooks/usePerfil';
 import { useBarberia } from '../hooks/useBarberia';
 import { FormularioCambiarContrasena } from '../components/FormularioCambiarContrasena';
+import { FormularioEditarPerfil } from '../components/FormularioEditarPerfil';
 import { FormularioHorario } from '../components/FormularioHorario';
 import type { AppDrawerScreenProps } from '../../../../app/navigation/types';
 
 /**
- * Configuración. Ambos roles ven y editan sus propios datos, cambian su
+ * Configuración. Ambos roles editan sus datos personales, cambian su
  * contraseña, ven la información de su cuenta y cierran sesión. El admin
  * además ve los datos de su barbería y edita el horario de atención.
- *
- * Nombre, apellido, correo y teléfono se muestran SIEMPRE en modo lectura:
- * no existe todavía un procedimiento para actualizarlos (ver nota en el
- * README), así que esta pantalla no ofrece un formulario que terminaría
- * fallando contra el backend.
  */
 export function ConfiguracionScreen({ navigation }: AppDrawerScreenProps<'Configuracion'>) {
   const { perfil: sesion, cerrarSesion } = useAuth();
@@ -75,12 +71,12 @@ export function ConfiguracionScreen({ navigation }: AppDrawerScreenProps<'Config
         ) : datos === null ? null : (
           <>
             <Seccion titulo="Tus datos">
-              <Dato etiqueta="Nombre" valor={`${datos.nombre} ${datos.apellido ?? ''}`.trim()} />
               <Dato etiqueta="Correo" valor={datos.correo} />
-              <Dato etiqueta="Teléfono" valor={datos.telefono ?? 'Sin registrar'} />
-              <Text style={estilos.notaSoloLectura}>
-                Estos datos son de solo lectura por ahora.
-              </Text>
+              <Text style={estilos.notaSoloLectura}>El correo no es editable.</Text>
+              <FormularioEditarPerfil
+                perfil={datos}
+                onActualizado={() => { void perfil.refetch(); }}
+              />
             </Seccion>
 
             <Seccion titulo="Información de la cuenta">
@@ -107,9 +103,6 @@ export function ConfiguracionScreen({ navigation }: AppDrawerScreenProps<'Config
                       <Dato etiqueta="Nombre" valor={barberia.data.nombre} />
                       <Dato etiqueta="Dirección" valor={barberia.data.direccion ?? 'Sin registrar'} />
                       <Dato etiqueta="Teléfono" valor={barberia.data.telefono ?? 'Sin registrar'} />
-                      <Text style={estilos.notaSoloLectura}>
-                        Estos datos son de solo lectura por ahora.
-                      </Text>
                     </>
                   ) : null}
                 </Seccion>
@@ -152,7 +145,7 @@ function Dato({ etiqueta, valor }: { etiqueta: string; valor: string }) {
   return (
     <View style={estilos.fila}>
       <Text style={estilos.etiqueta}>{etiqueta}</Text>
-      <Text style={estilos.valor} numberOfLines={1}>
+      <Text style={estilos.valor} numberOfLines={2}>
         {valor}
       </Text>
     </View>

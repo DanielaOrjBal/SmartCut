@@ -37,6 +37,9 @@ export function telefonoValido(valor: string, obligatorio = true): string | null
   return null;
 }
 
+/** HH:mm en rango 00:00–23:59 */
+export const REGEX_HORA = /^([01]\d|2[0-3]):[0-5]\d$/;
+
 export function contrasenaValida(valor: string): string | null {
   if (valor.length === 0) {
     return 'La contraseña es obligatoria.';

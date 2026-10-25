@@ -16,6 +16,11 @@ import { formatearCOP } from '../../../../core/utils/moneda';
 import { Esqueleto } from '../../../../core/components/Esqueleto';
 import { EstadoError } from '../../../../core/components/EstadoError';
 import { EstadoVacio } from '../../../../core/components/EstadoVacio';
+import {
+  ETIQUETA_MEDIO_PAGO,
+  SelectorMedioPago,
+  type MedioPago,
+} from '../../../../core/components/SelectorMedioPago';
 import { useServicios } from '../../../dashboard/presentation/hooks/useServicios';
 import { useRegistrarAtencion } from '../hooks/useRegistrarAtencion';
 import { ItemServicio, formatearDuracion } from './ItemServicio';
@@ -45,6 +50,7 @@ export function ModalRegistrarAtencion({ visible, onClose, onRegistrada }: Props
   const [vista, setVista] = useState<Vista>('formulario');
   const [nombreCliente, setNombreCliente] = useState('');
   const [seleccionados, setSeleccionados] = useState<Set<number>>(new Set());
+  const [medioPago, setMedioPago] = useState<MedioPago | null>(null);
   const [intentoEnviar, setIntentoEnviar] = useState(false);
   const [resultado, setResultado] = useState<AtencionRegistrada | null>(null);
 
@@ -58,7 +64,8 @@ export function ModalRegistrarAtencion({ visible, onClose, onRegistrada }: Props
 
   const nombreValido = nombreCliente.trim().length > 0;
   const serviciosValidos = elegidos.length > 0;
-  const formularioValido = nombreValido && serviciosValidos;
+  const medioPagoValido = medioPago !== null;
+  const formularioValido = nombreValido && serviciosValidos && medioPagoValido;
 
   function alternarServicio(idServicio: number) {
     setSeleccionados((previo) => {
@@ -76,6 +83,7 @@ export function ModalRegistrarAtencion({ visible, onClose, onRegistrada }: Props
     setVista('formulario');
     setNombreCliente('');
     setSeleccionados(new Set());
+    setMedioPago(null);
     setIntentoEnviar(false);
     setResultado(null);
     registrar.limpiarError();
@@ -96,6 +104,8 @@ export function ModalRegistrarAtencion({ visible, onClose, onRegistrada }: Props
       const atencion = await registrar.ejecutar({
         nombreCliente: nombreCliente.trim(),
         servicios: [...seleccionados],
+        // medioPago es non-null aquí: la guarda formularioValido
+        medioPago: medioPago!,
       });
       setResultado(atencion);
       setVista('resultado');
@@ -119,7 +129,11 @@ export function ModalRegistrarAtencion({ visible, onClose, onRegistrada }: Props
           </View>
 
           {vista === 'resultado' && resultado !== null ? (
-            <VistaResultado resultado={resultado} onCerrar={cerrar} />
+            <VistaResultado
+              resultado={resultado}
+              medioPagoUsado={ETIQUETA_MEDIO_PAGO[medioPago!]}
+              onCerrar={cerrar}
+            />
           ) : (
             <ScrollView
               style={estilos.cuerpo}
@@ -175,6 +189,14 @@ export function ModalRegistrarAtencion({ visible, onClose, onRegistrada }: Props
                 <Text style={formStyles.mensajeError}>Selecciona al menos un servicio.</Text>
               )}
 
+              <View style={estilos.labelServicios}>
+                <SelectorMedioPago
+                  valor={medioPago}
+                  onCambiar={setMedioPago}
+                  conError={intentoEnviar && !medioPagoValido}
+                />
+              </View>
+
               {registrar.error !== null && (
                 <Text style={[formStyles.mensajeError, estilos.errorEnvio]}>{registrar.error}</Text>
               )}
@@ -224,9 +246,11 @@ export function ModalRegistrarAtencion({ visible, onClose, onRegistrada }: Props
 
 function VistaResultado({
   resultado,
+  medioPagoUsado,
   onCerrar,
 }: {
   resultado: AtencionRegistrada;
+  medioPagoUsado: string;
   onCerrar: () => void;
 }) {
   return (
@@ -249,6 +273,11 @@ function VistaResultado({
           <Text style={[estilos.resultadoValor, estilos.resultadoComision]}>
             {formatearCOP(resultado.comision)}
           </Text>
+        </View>
+        <View style={estilos.resultadoSeparador} />
+        <View style={estilos.resultadoFila}>
+          <Text style={estilos.resultadoEtiqueta}>Medio de pago</Text>
+          <Text style={estilos.resultadoValor}>{medioPagoUsado}</Text>
         </View>
       </View>
 

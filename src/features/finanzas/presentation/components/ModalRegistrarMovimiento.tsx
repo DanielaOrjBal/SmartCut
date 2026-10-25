@@ -12,32 +12,17 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { colors, fontSizes, radii, spacing } from '../../../../core/theme/tokens';
 import { formStyles } from '../../../../core/theme/formStyles';
-import { aISO, fechaDesdeISO, formatearFechaLarga, hoyISO } from '../../../../core/utils/fechas';
+import { formatearFechaLarga, hoyISO, sumarDias } from '../../../../core/utils/fechas';
 import { useCategorias } from '../hooks/useCategorias';
 import { useRegistrarMovimiento } from '../hooks/useRegistrarMovimiento';
 import { ModalCategorias } from './ModalCategorias';
-import { TIPOS_MOVIMIENTO, type TipoMovimiento } from '../../domain/finanzas';
+import { ETIQUETA_TIPO, TIPOS_MOVIMIENTO, type TipoMovimiento } from '../../domain/finanzas';
 
 type Props = {
   visible: boolean;
   onClose: () => void;
   onRegistrado: () => void;
 };
-
-const ETIQUETA_TIPO: Record<TipoMovimiento, string> = {
-  ingreso: 'Ingreso',
-  gasto: 'Gasto',
-  compra: 'Compra',
-};
-
-/** Suma (o resta) días a una fecha ISO sin pasar por husos horarios. */
-function sumarDias(iso: string, dias: number): string {
-  const fecha = fechaDesdeISO(iso);
-  if (fecha === null) {
-    return iso;
-  }
-  return aISO(new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + dias));
-}
 
 /**
  * Registro de un movimiento manual: ingreso, gasto o compra.

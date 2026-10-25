@@ -2,6 +2,7 @@ const { pool } = require('../config/db');
 const { hashear, generarProvisional } = require('../utils/password');
 const { primeraFila, filas, oNulo } = require('../utils/sp');
 const { AppError } = require('../utils/AppError');
+const { encolarCorreo } = require('../queues/emailQueue');
 
 /**
  * Alta de un barbero una vez terminado el onboarding.
@@ -13,18 +14,35 @@ async function crearBarbero({ idBarberia, barbero }) {
   const contrasenaProvisional = generarProvisional();
   const hash = await hashear(contrasenaProvisional);
 
-  const [resultado] = await pool.query('CALL sp_crear_barbero_provisional(?, ?, ?, ?, ?, ?)', [
-    idBarberia,
-    barbero.nombre,
-    oNulo(barbero.apellido),
-    barbero.correo,
-    hash,
-    oNulo(barbero.telefono),
+  const [[rowBarberia], [resultado]] = await Promise.all([
+    pool.query('SELECT nombre FROM barberia WHERE id_barberia = ?', [idBarberia]),
+    pool.query('CALL sp_crear_barbero_provisional(?, ?, ?, ?, ?, ?)', [
+      idBarberia,
+      barbero.nombre,
+      oNulo(barbero.apellido),
+      barbero.correo,
+      hash,
+      oNulo(barbero.telefono),
+    ]),
   ]);
 
   const fila = primeraFila(resultado);
   if (!fila || fila.id_barbero === undefined) {
     throw new AppError('No se pudo crear al barbero. Intenta de nuevo.', 500);
+  }
+
+  const nombreBarberia = rowBarberia?.[0]?.nombre ?? 'tu barbería';
+
+  try {
+    await encolarCorreo('credenciales_barbero', {
+      nombre: barbero.nombre,
+      apellido: barbero.apellido ?? null,
+      correo: barbero.correo,
+      contrasenaProvisional,
+      nombreBarberia,
+    });
+  } catch (emailErr) {
+    console.error('[barbero] No se pudo encolar correo de credenciales:', emailErr.message);
   }
 
   return {

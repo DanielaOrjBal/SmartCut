@@ -2,6 +2,7 @@ const { pool } = require('../config/db');
 const { hashear, generarProvisional } = require('../utils/password');
 const { primeraFila, oNulo } = require('../utils/sp');
 const { AppError } = require('../utils/AppError');
+const { encolarCorreo } = require('../queues/emailQueue');
 
 /**
  * Crea la barbería completa en UNA sola transacción.
@@ -111,6 +112,28 @@ async function crearOnboarding(datos) {
 
     // 7.
     await conexion.commit();
+
+    // Correos fuera de la transacción. Si el encolado falla (p.ej. migración
+    // pendiente) se registra el error pero la barbería ya quedó creada y no
+    // se hace rollback de nada.
+    try {
+      await encolarCorreo('bienvenida_admin', {
+        correoAdmin: datos.admin.correo,
+        nombreAdmin: datos.admin.nombre,
+        nombreBarberia: datos.barberia.nombre,
+      });
+      for (const b of credenciales) {
+        await encolarCorreo('credenciales_barbero', {
+          nombre: b.nombre,
+          apellido: b.apellido ?? null,
+          correo: b.correo,
+          contrasenaProvisional: b.contrasenaProvisional,
+          nombreBarberia: datos.barberia.nombre,
+        });
+      }
+    } catch (emailErr) {
+      console.error('[onboarding] No se pudieron encolar correos:', emailErr.message);
+    }
 
     return {
       idBarberia,

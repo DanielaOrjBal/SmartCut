@@ -1,6 +1,7 @@
 const { pool } = require('../config/db');
 const { filas } = require('../utils/sp');
 const { AppError } = require('../utils/AppError');
+const { encolarCorreo } = require('../queues/emailQueue');
 
 /**
  * Datos de la barbería, para Configuración.
@@ -37,7 +38,7 @@ async function obtenerBarberia(idBarberia) {
 }
 
 /** Configura el horario de atención. Mismo procedimiento que usa el onboarding. */
-async function actualizarHorario({ idBarberia, dias, horaApertura, horaCierre, duracionTurno }) {
+async function actualizarHorario({ idBarberia, dias, horaApertura, horaCierre, duracionTurno, correoAdmin }) {
   await pool.query('CALL sp_configurar_horario(?, ?, ?, ?, ?)', [
     idBarberia,
     dias.join(','),
@@ -46,7 +47,20 @@ async function actualizarHorario({ idBarberia, dias, horaApertura, horaCierre, d
     duracionTurno,
   ]);
 
-  return obtenerBarberia(idBarberia);
+  const barberia = await obtenerBarberia(idBarberia);
+
+  if (correoAdmin) {
+    try {
+      await encolarCorreo('actualizacion_horario', {
+        correoAdmin,
+        nombreBarberia: barberia.nombre,
+      });
+    } catch (emailErr) {
+      console.error('[barberia] No se pudo encolar correo de horario:', emailErr.message);
+    }
+  }
+
+  return barberia;
 }
 
 module.exports = { obtenerBarberia, actualizarHorario };

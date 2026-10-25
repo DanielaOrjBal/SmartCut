@@ -42,6 +42,7 @@ async function registrarAtencion(req, res) {
     idBarbero: req.usuario.idBarbero,
     nombreCliente: req.body.nombreCliente,
     servicios: req.body.servicios,
+    medioPago: req.body.medioPago,
   });
 
   res.status(201).json({ atencion });
@@ -56,7 +57,9 @@ async function registrarAtencion(req, res) {
  * sea admin o no.
  */
 async function cambiarEstadoCita(req, res) {
-  const { estado, fecha, motivo } = req.body;
+  // req.body fue reemplazado por el middleware validar() con el objeto ya
+  // parseado y validado (incluido el .refine que exige medioPago para 'finalizada').
+  const { estado, fecha, motivo, medioPago } = req.body;
 
   const cita = await agendaService.buscarCitaDelDia({
     idBarberia: req.usuario.idBarberia,
@@ -73,6 +76,7 @@ async function cambiarEstadoCita(req, res) {
     cita,
     estado,
     motivo,
+    medioPago,
     esAdmin: req.usuario.esAdmin,
   });
 

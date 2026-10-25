@@ -107,4 +107,23 @@ router.get(
   finanzasController.informeMensual,
 );
 
+// Métricas detalladas de un barbero: resumen + medio_pago + servicios.
+// mis-metricas: el barbero ve las suyas; admin también puede usarlo.
+router.get(
+  '/mis-metricas',
+  autenticar,
+  validar(resumenQuerySchema, 'query'),
+  finanzasController.misMetricas,
+);
+
+// Admin puede pedir las métricas de cualquier barbero de su barbería.
+router.get(
+  '/barbero/:id/metricas',
+  autenticar,
+  soloAdmin,
+  validar(idParamsSchema, 'params'),
+  validar(resumenQuerySchema, 'query'),
+  finanzasController.metricasBarbero,
+);
+
 module.exports = router;

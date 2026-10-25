@@ -1,53 +1,25 @@
 const { Router } = require('express');
 
-const { validar } = require('../middlewares/validar');
 const { autenticar, soloAdmin } = require('../middlewares/autenticar');
-const {
-  agendaQuerySchema,
-  crearAtencionSchema,
-  estadoCitaSchema,
-  idParamsSchema,
-} = require('../schemas/dashboard.schema');
+const { validar } = require('../middlewares/validar');
+const { actualizarPerfilSchema } = require('../schemas/dashboard.schema');
 const dashboardController = require('../controllers/dashboard.controller');
-const agendaController = require('../controllers/agenda.controller');
 
 const router = Router();
 
-// ------------------------------------------------------------- dashboards ---
+// GET /api/dashboard/barbero  — resumen del usuario en sesión
+router.get('/barbero', autenticar, dashboardController.resumenBarbero);
 
-router.get('/dashboard/barbero', autenticar, dashboardController.resumenBarbero);
-router.get('/dashboard/barberia', autenticar, soloAdmin, dashboardController.resumenBarberia);
+// GET /api/dashboard/barberia — métricas globales de la barbería, solo admin
+router.get('/barberia', autenticar, soloAdmin, dashboardController.resumenBarberia);
 
+// GET /api/dashboard/perfil — datos de sesión del usuario autenticado
 router.get('/perfil', autenticar, dashboardController.obtenerPerfil);
 
-// Catálogo para el modal de registro de atención. No está en la tabla original
-// de endpoints, pero sin él ese modal no tendría servicios que ofrecer.
+// PATCH /api/dashboard/perfil — actualiza nombre, apellido y teléfono del usuario
+router.patch('/perfil', autenticar, validar(actualizarPerfilSchema), dashboardController.actualizarPerfil);
+
+// GET /api/dashboard/servicios — catálogo activo de la barbería (para registro de atención)
 router.get('/servicios', autenticar, dashboardController.listarServicios);
-
-// ----------------------------------------------------------------- agenda ---
-
-router.get(
-  '/agenda',
-  autenticar,
-  validar(agendaQuerySchema, 'query'),
-  agendaController.listarAgenda,
-);
-
-router.post(
-  '/atenciones',
-  autenticar,
-  validar(crearAtencionSchema),
-  agendaController.registrarAtencion,
-);
-
-// Tampoco figura en la tabla, pero la agenda sin acciones no sirve de nada:
-// confirmar, iniciar, finalizar, cancelar y marcar que no asistió pasan aquí.
-router.patch(
-  '/citas/:id/estado',
-  autenticar,
-  validar(idParamsSchema, 'params'),
-  validar(estadoCitaSchema),
-  agendaController.cambiarEstadoCita,
-);
 
 module.exports = router;

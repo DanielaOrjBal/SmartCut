@@ -17,3 +17,9 @@ export type NuevoHorario = {
   horaCierre: string;
   duracionTurno: number;
 };
+
+export type ActualizarPerfilPayload = {
+  nombre: string;
+  apellido?: string | null;
+  telefono?: string | null;
+};

@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { colors, estadoCitaColors, fontSizes, radii, spacing } from '../../../../core/theme/tokens';
+import { colors, fontSizes, radii, spacing } from '../../../../core/theme/tokens';
 import { formStyles } from '../../../../core/theme/formStyles';
 import { formatearCOP } from '../../../../core/utils/moneda';
 import { useDetalleBarbero } from '../hooks/useDetalleBarbero';
@@ -19,6 +19,7 @@ import { EstadoError } from '../../../../core/components/EstadoError';
 import { Esqueleto } from '../../../../core/components/Esqueleto';
 import type { EstadoBarbero } from '../../../auth/domain/auth';
 import type { ParametrosEquipo } from '../../domain/equipo';
+import { COLOR_ESTADO, ETIQUETA_ESTADO } from '../constantes';
 
 type Props = {
   idBarbero: number | null;
@@ -29,16 +30,6 @@ type Props = {
 };
 
 const OPCIONES_ESTADO: EstadoBarbero[] = ['activo', 'incapacitado', 'inactivo'];
-const ETIQUETA_ESTADO: Record<EstadoBarbero, string> = {
-  activo: 'Activo',
-  incapacitado: 'Incapacitado',
-  inactivo: 'Inactivo',
-};
-const COLOR_ESTADO: Record<EstadoBarbero, string> = {
-  activo: '#16A34A',
-  incapacitado: estadoCitaColors.no_asistio,
-  inactivo: colors.danger,
-};
 
 /**
  * Detalle de un barbero: sus datos, comisión, desempeño del período y las

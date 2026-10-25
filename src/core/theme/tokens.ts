@@ -99,11 +99,6 @@ export const fontSizes = {
   titleLarge: 26,
 } as const;
 
-export const fontWeights = {
-  medium: '500',
-  semibold: '600',
-  bold: '700',
-} as const;
 
 /** Sombra dorada de los botones principales */
 export const shadows = {

@@ -8,6 +8,9 @@ server/node_modules/
 .env
 server/.env
 
+#db
+db/
+
 # Expo
 .expo/
 dist/

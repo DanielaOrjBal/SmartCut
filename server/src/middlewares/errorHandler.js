@@ -7,6 +7,10 @@ const { AppError } = require('../utils/AppError');
 const MENSAJES_DUPLICADO = [
   { indice: 'uq_barbero_correo', mensaje: 'Ya existe una cuenta con ese correo.' },
   {
+    indice: 'uq_cliente_correo',
+    mensaje: 'El correo ingresado ya se encuentra asociado a otro cliente.',
+  },
+  {
     indice: 'uq_servicio_barberia_nombre',
     mensaje: 'Ya agregaste un servicio con ese nombre.',
   },
@@ -63,7 +67,7 @@ function errorHandler(err, req, res, next) {
 
 /** Se monta después de todas las rutas: lo que llegue aquí no existe. */
 function noEncontrado(req, res) {
-  res.status(404).json({ mensaje: `No existe la ruta ${req.method} ${req.originalUrl}` });
+  res.status(404).json({ mensaje: 'Ruta no encontrada.' });
 }
 
 module.exports = { errorHandler, noEncontrado };

@@ -5,14 +5,13 @@ import { formStyles } from '../../../../core/theme/formStyles';
 import { Chip } from '../../../onboarding/presentation/components/Chip';
 import { DIAS_SEMANA, DURACIONES_TURNO, type DiaSemana } from '../../../onboarding/domain/onboarding';
 import { useActualizarHorario } from '../hooks/useActualizarHorario';
+import { REGEX_HORA } from '../../../../core/validacion/campos';
 import type { BarberiaInfo } from '../../domain/configuracion';
 
 type Props = {
   barberia: BarberiaInfo;
   onActualizado: (barberia: BarberiaInfo) => void;
 };
-
-const REGEX_HORA = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 /** 'HH:MM:SS' → 'HH:MM', para mostrar en el input de texto. */
 function aHHMM(hora: string): string {

@@ -37,9 +37,6 @@ export function setAuthToken(token: string | null): void {
   tokenEnMemoria = token;
 }
 
-export function getAuthToken(): string | null {
-  return tokenEnMemoria;
-}
 
 const MENSAJES_POR_ESTADO: Readonly<Record<number, string>> = {
   400: 'Los datos enviados no son válidos.',
@@ -53,8 +50,7 @@ const MENSAJES_POR_ESTADO: Readonly<Record<number, string>> = {
 const MENSAJE_GENERICO = 'Ocurrió un error inesperado. Intenta de nuevo.';
 
 const MENSAJE_SIN_RED =
-  'No pudimos conectar con el servidor. Revisa que esté encendido y que la ' +
-  'dirección configurada en src/core/config/env.ts sea la correcta.';
+  'No pudimos conectar con el servidor. Verifica tu conexión a internet y vuelve a intentarlo.';
 
 function parsearJson(texto: string): unknown {
   if (texto.trim().length === 0) {

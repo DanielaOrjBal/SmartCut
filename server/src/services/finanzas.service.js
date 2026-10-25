@@ -299,6 +299,8 @@ function mapearMovimiento(fila) {
     idCita: fila.cita_id === null ? null : numero(fila.cita_id),
     origen: fila.origen,
     estado: fila.estado,
+    // Solo los ingresos automáticos por cita traen medio de pago.
+    medioPago: fila.medio_pago ?? null,
     fecha: fila.fecha,
   };
 }
@@ -458,6 +460,60 @@ async function informeMensual({ idBarberia, anio, mes }) {
   };
 }
 
+// ---------------------------------------------------------- métricas barbero ---
+
+/**
+ * Métricas detalladas de un barbero para un rango.
+ *
+ * `sp_metricas_barbero` devuelve TRES conjuntos de resultados:
+ *   resultado[0] → resumen (una fila)
+ *   resultado[1] → desglose por medio de pago
+ *   resultado[2] → desglose por servicio
+ *
+ * El id del barbero ya viene validado (JWT o param de URL verificado por el
+ * controlador); el SP no distingue roles: la restricción es de routing.
+ */
+async function metricasBarbero({ idBarberia, idBarbero, periodo, desde, hasta }) {
+  const rango = resolverPeriodo(periodo, desde, hasta);
+
+  const [resultado] = await pool.query('CALL sp_metricas_barbero(?, ?, ?, ?)', [
+    idBarberia,
+    idBarbero,
+    rango.desde,
+    rango.hasta,
+  ]);
+
+  const resumenFila = Array.isArray(resultado[0]) ? resultado[0][0] ?? null : null;
+  const mediosPago = Array.isArray(resultado[1]) ? resultado[1] : [];
+  const servicios = Array.isArray(resultado[2]) ? resultado[2] : [];
+
+  return {
+    rango,
+    resumen: resumenFila
+      ? {
+          idBarbero: numero(resumenFila.id_barbero),
+          barbero: resumenFila.barbero,
+          porcentajeComision: numero(resumenFila.porcentaje_comision),
+          citasAtendidas: numero(resumenFila.citas_atendidas),
+          facturacion: numero(resumenFila.facturacion),
+          comision: numero(resumenFila.comision),
+          ticketPromedio: numero(resumenFila.ticket_promedio),
+        }
+      : null,
+    mediosPago: mediosPago.map((fila) => ({
+      medioPago: fila.medio_pago,
+      citas: numero(fila.citas),
+      facturado: numero(fila.facturado),
+    })),
+    servicios: servicios.map((fila) => ({
+      idServicio: numero(fila.id_servicio),
+      servicio: fila.servicio,
+      veces: numero(fila.veces),
+      facturado: numero(fila.facturado),
+    })),
+  };
+}
+
 module.exports = {
   resumen,
   serie,
@@ -471,4 +527,5 @@ module.exports = {
   listarCategorias,
   crearCategoria,
   informeMensual,
+  metricasBarbero,
 };

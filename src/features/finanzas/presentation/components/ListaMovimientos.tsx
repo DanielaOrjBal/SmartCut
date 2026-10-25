@@ -5,7 +5,15 @@ import type { ComponentProps } from 'react';
 import { colors, fontSizes, radii, spacing } from '../../../../core/theme/tokens';
 import { formatearCOP } from '../../../../core/utils/moneda';
 import { formatearFechaCorta } from '../../../../core/utils/fechas';
+import { ETIQUETA_MEDIO_PAGO, type MedioPago } from '../../../../core/components/SelectorMedioPago';
 import type { Movimiento, TipoMovimiento } from '../../domain/finanzas';
+
+const MEDIOS_PAGO_VALIDOS = new Set<string>(['efectivo', 'tarjeta', 'nequi', 'pse', 'bre_b']);
+
+function etiquetaMedioPago(medio: string | null): string | null {
+  if (medio === null) return null;
+  return MEDIOS_PAGO_VALIDOS.has(medio) ? ETIQUETA_MEDIO_PAGO[medio as MedioPago] : medio;
+}
 
 type Props = {
   movimientos: Movimiento[];
@@ -55,6 +63,9 @@ export function ListaMovimientos({ movimientos, onAnular }: Props) {
               </Text>
               <Text style={estilos.detalle} numberOfLines={1}>
                 {formatearFechaCorta(movimiento.fecha.slice(0, 10))}
+                {etiquetaMedioPago(movimiento.medioPago) !== null
+                  ? ` · ${etiquetaMedioPago(movimiento.medioPago)}`
+                  : ''}
                 {movimiento.descripcion !== null && movimiento.descripcion.length > 0
                   ? ` · ${movimiento.descripcion}`
                   : ''}
