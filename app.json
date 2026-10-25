@@ -28,6 +28,12 @@
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "83a31e8c-308b-4484-b21b-947e51d03aa0"
+      }
+    },
+    "owner": "danielaorjbal"
   }
 }
