@@ -43,9 +43,14 @@ const pool = mysql.createPool({
 // "Cerrada" en lugar de "Sin abrir".
 pool.pool.on('connection', (conexion) => {
   conexion.query("SET time_zone = '-05:00'", (err) => {
-    if (err) {
-      console.error('[db] No se pudo fijar el timezone de sesión:', err.message);
-    }
+    if (err) console.error('[db] No se pudo fijar el timezone de sesión:', err.message);
+  });
+  // Fuerza utf8mb4_0900_ai_ci en cada conexión para que los parámetros
+  // pasados desde Node coincidan con la colación de las columnas del dump.
+  // Sin esto, Aiven asigna utf8mb4_unicode_ci a los parámetros y los SPs
+  // que comparan VARCHAR lanzan ER_CANT_AGGREGATE_2COLLATIONS.
+  conexion.query("SET NAMES utf8mb4 COLLATE utf8mb4_0900_ai_ci", (err) => {
+    if (err) console.error('[db] No se pudo fijar la colación de sesión:', err.message);
   });
 });
 
