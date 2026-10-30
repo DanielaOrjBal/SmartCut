@@ -173,7 +173,6 @@ export function CambiarContrasenaScreen() {
             onPress={() => {
               void guardar();
             }}
-            deshabilitado={!esValido}
             cargando={guardando}
           />
 

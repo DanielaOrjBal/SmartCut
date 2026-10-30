@@ -31,9 +31,33 @@ export function telefonoValido(valor: string, obligatorio = true): string | null
   if (recortado.length === 0) {
     return obligatorio ? 'El teléfono es obligatorio.' : null;
   }
-  if (!/^[\d\s+()-]{7,20}$/.test(recortado)) {
-    return 'Escribe un teléfono válido.';
+  // Solo se permiten dígitos; se extraen para contar exactamente 10.
+  const soloDigitos = recortado.replace(/\D/g, '');
+  if (soloDigitos.length !== 10) {
+    return 'El teléfono debe tener exactamente 10 dígitos (ej: 3001234567).';
   }
+  return null;
+}
+
+/** Valida nombre o apellido de persona: solo letras (incluyendo tildes), mínimo 3. */
+export function nombreValido(valor: string, etiqueta: string): string | null {
+  const recortado = valor.trim();
+  if (recortado.length === 0) return `${etiqueta} es obligatorio.`;
+  if (recortado.length < 3) return `${etiqueta} debe tener al menos 3 letras.`;
+  if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/.test(recortado)) {
+    return `${etiqueta} solo puede contener letras.`;
+  }
+  return null;
+}
+
+/** Valida número de cédula: solo dígitos, mínimo 6. */
+export function cedulaValida(valor: string, obligatorio = true): string | null {
+  const recortado = valor.trim();
+  if (recortado.length === 0) {
+    return obligatorio ? 'La cédula es obligatoria.' : null;
+  }
+  if (!/^\d+$/.test(recortado)) return 'La cédula solo puede contener números.';
+  if (recortado.length < 6) return 'La cédula debe tener al menos 6 dígitos.';
   return null;
 }
 
@@ -50,6 +74,12 @@ export function contrasenaValida(valor: string): string | null {
   // bcrypt ignora lo que pase de 72 bytes: aceptar más sería engañoso.
   if (valor.length > 72) {
     return 'La contraseña no puede superar 72 caracteres.';
+  }
+  if (!/[0-9]/.test(valor)) {
+    return 'La contraseña debe incluir al menos un número.';
+  }
+  if (!/[^A-Za-z0-9]/.test(valor)) {
+    return 'La contraseña debe incluir al menos un carácter especial (ej: @, #, $, !).';
   }
   return null;
 }

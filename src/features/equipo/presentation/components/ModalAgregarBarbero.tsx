@@ -12,6 +12,7 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { colors, fontSizes, spacing } from '../../../../core/theme/tokens';
 import { formStyles } from '../../../../core/theme/formStyles';
+import { nombreValido as validarNombre } from '../../../../core/validacion/campos';
 import { TarjetaCredencial } from '../../../onboarding/presentation/components/TarjetaCredencial';
 import { useCrearBarbero } from '../hooks/useAccionesEquipo';
 import type { BarberoCreado } from '../../domain/equipo';
@@ -59,10 +60,13 @@ export function ModalAgregarBarbero({ visible, onClose, onCreado }: Props) {
     }
   }
 
-  const nombreValido = nombre.trim().length > 0;
-  const apellidoValido = apellido.trim().length > 0;
+  const nombreValido = validarNombre(nombre, 'El nombre') === null;
+  const apellidoValido = validarNombre(apellido, 'El apellido') === null;
   const correoValido = CORREO_VALIDO.test(correo.trim());
   const formularioValido = nombreValido && apellidoValido && correoValido;
+
+  const errorNombre = intentoEnviar ? validarNombre(nombre, 'El nombre') : null;
+  const errorApellido = intentoEnviar ? validarNombre(apellido, 'El apellido') : null;
 
   async function confirmar() {
     setIntentoEnviar(true);
@@ -113,7 +117,7 @@ export function ModalAgregarBarbero({ visible, onClose, onCreado }: Props) {
             <ScrollView contentContainerStyle={estilos.cuerpo} keyboardShouldPersistTaps="handled">
               <Text style={formStyles.label}>NOMBRE</Text>
               <TextInput
-                style={[formStyles.input, intentoEnviar && !nombreValido && formStyles.inputConError]}
+                style={[formStyles.input, errorNombre !== null && formStyles.inputConError]}
                 placeholder="Nombre"
                 placeholderTextColor={colors.placeholder}
                 value={nombre}
@@ -121,10 +125,13 @@ export function ModalAgregarBarbero({ visible, onClose, onCreado }: Props) {
                 autoCapitalize="words"
                 maxLength={80}
               />
+              {errorNombre !== null && (
+                <Text style={[formStyles.mensajeError, estilos.espacio]}>{errorNombre}</Text>
+              )}
 
               <Text style={[formStyles.label, estilos.espacio]}>APELLIDO</Text>
               <TextInput
-                style={[formStyles.input, intentoEnviar && !apellidoValido && formStyles.inputConError]}
+                style={[formStyles.input, errorApellido !== null && formStyles.inputConError]}
                 placeholder="Apellido"
                 placeholderTextColor={colors.placeholder}
                 value={apellido}
@@ -132,6 +139,9 @@ export function ModalAgregarBarbero({ visible, onClose, onCreado }: Props) {
                 autoCapitalize="words"
                 maxLength={80}
               />
+              {errorApellido !== null && (
+                <Text style={[formStyles.mensajeError, estilos.espacio]}>{errorApellido}</Text>
+              )}
 
               <Text style={[formStyles.label, estilos.espacio]}>CORREO</Text>
               <TextInput

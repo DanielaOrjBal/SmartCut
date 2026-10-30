@@ -4,6 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { colors, fontSizes, radii, spacing } from '../../../../core/theme/tokens';
 import { formStyles } from '../../../../core/theme/formStyles';
 import { CampoTexto } from '../../../../core/components/CampoTexto';
+import { nombreValido, telefonoValido } from '../../../../core/validacion/campos';
 import { useActualizarPerfil } from '../hooks/useActualizarPerfil';
 import type { PerfilUsuario } from '../../../dashboard/domain/dashboard';
 
@@ -23,7 +24,7 @@ export function FormularioEditarPerfil({ perfil, onActualizado }: Props) {
   const [nombre, setNombre] = useState(perfil.nombre);
   const [apellido, setApellido] = useState(perfil.apellido ?? '');
   const [telefono, setTelefono] = useState(perfil.telefono ?? '');
-  const [tocado, setTocado] = useState({ nombre: false });
+  const [tocado, setTocado] = useState({ nombre: false, apellido: false, telefono: false });
   const [exito, setExito] = useState(false);
 
   // Si el perfil cambia desde afuera (ej. refetch), re-sincronizar los campos
@@ -33,10 +34,21 @@ export function FormularioEditarPerfil({ perfil, onActualizado }: Props) {
     setTelefono(perfil.telefono ?? '');
   }, [perfil.nombre, perfil.apellido, perfil.telefono]);
 
-  const errorNombre =
-    tocado.nombre && nombre.trim().length === 0 ? 'El nombre es obligatorio.' : null;
+  const errorNombre = tocado.nombre ? nombreValido(nombre, 'El nombre') : null;
+  const errorApellido = tocado.apellido && apellido.trim().length > 0
+    ? nombreValido(apellido, 'El apellido')
+    : null;
+  const errorTelefono = tocado.telefono && telefono.trim().length > 0
+    ? telefonoValido(telefono, false)
+    : null;
 
-  const formularioValido = nombre.trim().length > 0;
+  // El botón se ve deshabilitado solo si los campos tocados tienen error,
+  // para no bloquear usuarios cuyo teléfono o apellido guardado no cumple el
+  // nuevo formato — solo se validan cuando el usuario los modifica.
+  const formularioValido =
+    nombreValido(nombre, 'El nombre') === null &&
+    (!tocado.apellido || apellido.trim().length === 0 || nombreValido(apellido, 'El apellido') === null) &&
+    (!tocado.telefono || telefono.trim().length === 0 || telefonoValido(telefono, false) === null);
 
   const sinCambios =
     nombre.trim() === perfil.nombre &&
@@ -44,10 +56,20 @@ export function FormularioEditarPerfil({ perfil, onActualizado }: Props) {
     (telefono.trim() || null) === (perfil.telefono ?? null);
 
   async function guardar() {
-    setTocado({ nombre: true });
+    setTocado({ nombre: true, apellido: true, telefono: true });
     setExito(false);
     mutacion.limpiarError();
-    if (!formularioValido) return;
+
+    // Los campos opcionales solo se validan si el usuario los modificó.
+    const telefonoModificado = (telefono.trim() || null) !== (perfil.telefono ?? null);
+    const apellidoModificado = (apellido.trim() || null) !== (perfil.apellido ?? null);
+
+    const todoCorrecto =
+      nombreValido(nombre, 'El nombre') === null &&
+      (!apellidoModificado || apellido.trim().length === 0 || nombreValido(apellido, 'El apellido') === null) &&
+      (!telefonoModificado || telefono.trim().length === 0 || telefonoValido(telefono, false) === null);
+
+    if (!todoCorrecto) return;
 
     try {
       const perfilNuevo = await mutacion.ejecutar({
@@ -85,19 +107,26 @@ export function FormularioEditarPerfil({ perfil, onActualizado }: Props) {
           setApellido(valor);
           setExito(false);
         }}
+        onBlur={() => setTocado((t) => ({ ...t, apellido: true }))}
+        error={errorApellido}
+        tocado={tocado.apellido}
         autoCapitalize="words"
         maxLength={80}
       />
 
       <CampoTexto
         etiqueta="TELÉFONO"
+        placeholder="3001234567"
         valor={telefono}
         onCambiar={(valor) => {
           setTelefono(valor);
           setExito(false);
         }}
+        onBlur={() => setTocado((t) => ({ ...t, telefono: true }))}
+        error={errorTelefono}
+        tocado={tocado.telefono}
         keyboardType="phone-pad"
-        maxLength={20}
+        maxLength={10}
       />
 
       {mutacion.error !== null && (

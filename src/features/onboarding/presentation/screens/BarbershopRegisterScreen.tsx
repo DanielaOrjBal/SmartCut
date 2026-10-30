@@ -70,14 +70,14 @@ export const BarbershopRegisterScreen = ({
 
       <CampoTexto
         etiqueta="TELÉFONO DE CONTACTO"
-        placeholder="+57 300 000 0000"
+        placeholder="3001234567"
         valor={barberia.telefono}
         onCambiar={(telefono) => actualizarBarberia({ telefono })}
         onBlur={() => marcar('telefono')}
         error={errores.telefono}
         tocado={tocados.telefono}
         keyboardType="phone-pad"
-        maxLength={20}
+        maxLength={10}
       />
 
       <CampoTexto

@@ -8,6 +8,12 @@ function resultadoSet(resultado, indice) {
   return Array.isArray(resultado?.[indice]) ? resultado[indice] : [];
 }
 
+// ─── Caché en memoria del contexto financiero ────────────────────────────────
+// Evita consultar la BD en cada pregunta: el contexto "últimos 30 días"
+// cambia muy poco en 60 segundos, así que la segunda pregunta (o más) no espera.
+const _cacheContexto = new Map();
+const CACHE_TTL_MS = 60_000; // 1 minuto
+
 function formatoCOP(valor) {
   return new Intl.NumberFormat('es-CO', {
     style: 'currency',
@@ -19,14 +25,22 @@ function formatoCOP(valor) {
 /**
  * Obtiene agregados de los últimos 30 días. Gemini nunca recibe acceso a la
  * base de datos: solamente esta representación reducida y sin PII.
+ * El resultado se guarda en caché 60 s para evitar una consulta a la BD
+ * en cada pregunta del usuario.
  */
 async function obtenerContextoFinanciero(idBarberia) {
+  const ahora = Date.now();
+  const entrada = _cacheContexto.get(idBarberia);
+  if (entrada && ahora - entrada.fecha < CACHE_TTL_MS) {
+    return entrada.contexto;
+  }
+
   const [resultado] = await pool.query('CALL sp_contexto_financiero(?)', [idBarberia]);
   const resumen = resultadoSet(resultado, 0)[0] ?? {};
   const barberos = resultadoSet(resultado, 1).slice(0, 3);
   const categorias = resultadoSet(resultado, 2).slice(0, 3);
 
-  return {
+  const contexto = {
     periodo: 'últimos 30 días',
     resumen: {
       ingresos: numero(resumen.ingresos),
@@ -43,6 +57,9 @@ async function obtenerContextoFinanciero(idBarberia) {
       total: numero(fila.total),
     })),
   };
+
+  _cacheContexto.set(idBarberia, { contexto, fecha: ahora });
+  return contexto;
 }
 
 /**
@@ -99,16 +116,16 @@ function conTimeout(promesa, milisegundos) {
 }
 
 /**
- * Llama a la API de Gemini con un reintento automático de 2 segundos si el
- * primer intento falla (timeout o error de red). El segundo fallo se propaga
- * al llamador para que lo convierta en una respuesta amigable.
+ * Llama a la API de Gemini con un reintento inmediato si el primer intento
+ * falla (timeout o error de red). El segundo fallo se propaga al llamador
+ * para que lo convierta en una respuesta amigable.
  */
 async function llamarConReintento(cliente, params, timeoutMs) {
   try {
     return await conTimeout(cliente.models.generateContent(params), timeoutMs);
   } catch (primerError) {
-    console.error(`[gemini] Primer intento fallido: ${primerError.constructor.name}. Reintentando en 2s…`);
-    await new Promise((resolver) => setTimeout(resolver, 2000));
+    console.error(`[gemini] Primer intento fallido: ${primerError.constructor.name}. Reintentando…`);
+    // Sin delay: reintentar de inmediato reduce el tiempo total en caso de fallo transitorio.
     return await conTimeout(cliente.models.generateContent(params), timeoutMs);
   }
 }
@@ -126,7 +143,14 @@ async function consultarAsistente({ idBarberia, pregunta }) {
         // systemInstruction y contents son canales separados en la API:
         // el modelo no puede confundir las instrucciones del sistema con el
         // input del usuario, lo que elimina el vector de inyección de prompt.
-        config: { systemInstruction: construirInstruccionSistema(contexto) },
+        config: {
+          systemInstruction: construirInstruccionSistema(contexto),
+          // Limitar la respuesta a ~400 tokens reduce el tiempo de generación
+          // considerablemente: para Q&A financiero breve sobra con ese límite.
+          maxOutputTokens: 400,
+          // temperature 0 = respuestas deterministas; Gemini las genera más rápido.
+          temperature: 0,
+        },
         contents: pregunta,
       },
       config.gemini.timeoutMs,

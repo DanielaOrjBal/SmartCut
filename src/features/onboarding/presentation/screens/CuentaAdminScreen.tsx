@@ -9,7 +9,7 @@ import { colors, fontSizes, radii, spacing } from '../../../../core/theme/tokens
 import {
   contrasenaValida,
   correoValido,
-  requerido,
+  nombreValido,
   telefonoValido,
 } from '../../../../core/validacion/campos';
 import type { OnboardingScreenProps } from '../../../../app/navigation/types';
@@ -33,8 +33,8 @@ export function CuentaAdminScreen({ navigation }: OnboardingScreenProps<'CuentaA
   const coincide = confirmacion.length > 0 && confirmacion === admin.contrasena;
 
   const errores = {
-    nombre: requerido(admin.nombre, 'Tu nombre'),
-    apellido: requerido(admin.apellido, 'Tu apellido'),
+    nombre: nombreValido(admin.nombre, 'Tu nombre'),
+    apellido: nombreValido(admin.apellido, 'Tu apellido'),
     correo: correoValido(admin.correo),
     telefono: telefonoValido(admin.telefono),
     contrasena: contrasenaValida(admin.contrasena),
@@ -111,14 +111,14 @@ export function CuentaAdminScreen({ navigation }: OnboardingScreenProps<'CuentaA
 
       <CampoTexto
         etiqueta="TELÉFONO"
-        placeholder="+57 300 000 0000"
+        placeholder="3001234567"
         valor={admin.telefono}
         onCambiar={(telefono) => actualizarAdmin({ telefono })}
         onBlur={() => marcar('telefono')}
         error={errores.telefono}
         tocado={tocados.telefono}
         keyboardType="phone-pad"
-        maxLength={20}
+        maxLength={10}
       />
 
       <CampoTexto
