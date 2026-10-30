@@ -37,7 +37,16 @@ export function StepCliente({ onSiguiente }: Props) {
   }
 
   function validarTelefono(v: string) {
-    return /^\d{10}$/.test(v.replace(/\s/g, ''));
+    const digits = v.replace(/\s/g, '');
+    if (!/^\d{10}$/.test(digits)) return false;
+    if (/^(\d)\1+$/.test(digits)) return false; // todos iguales: 1111111111
+    let seq = 1;
+    for (let i = 1; i < digits.length; i++) {
+      const diff = digits.charCodeAt(i) - digits.charCodeAt(i - 1);
+      if (diff === 1 || diff === -1) { if (++seq >= 5) return false; }
+      else seq = 1;
+    }
+    return true;
   }
 
   function validarNombreReal(v: string) {
@@ -72,7 +81,7 @@ export function StepCliente({ onSiguiente }: Props) {
     if (apellido.trim() && !validarNombreReal(apellido))
       e.apellido = 'El apellido ingresado no es válido (solo letras).';
     if (telefono.trim() && !validarTelefono(telefono))
-      e.telefono = 'El teléfono debe tener exactamente 10 dígitos numéricos.';
+      e.telefono = 'Ingresa un número de teléfono real (10 dígitos, sin secuencias como 1234567890).';
     return e;
   }
 

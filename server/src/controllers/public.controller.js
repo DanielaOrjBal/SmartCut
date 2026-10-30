@@ -109,6 +109,20 @@ const reservaBodySchema = z.object({
       (v) => /^\d{10}$/.test(v.replace(/\s/g, '')),
       'El teléfono debe tener exactamente 10 dígitos numéricos.',
     )
+    .refine(
+      (v) => {
+        const d = v.replace(/\s/g, '');
+        if (/^(\d)\1+$/.test(d)) return false;
+        let seq = 1;
+        for (let i = 1; i < d.length; i++) {
+          const diff = d.charCodeAt(i) - d.charCodeAt(i - 1);
+          if (diff === 1 || diff === -1) { if (++seq >= 5) return false; }
+          else seq = 1;
+        }
+        return true;
+      },
+      'El teléfono no puede ser una secuencia de dígitos repetidos o consecutivos.',
+    )
     .optional(),
   // Si el cliente ya existe, el frontend envía su id para reutilizarlo.
   // Si no, el backend lo crea con los datos anteriores.
