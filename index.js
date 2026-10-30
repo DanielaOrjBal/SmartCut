@@ -3,15 +3,6 @@
 // lateral (@react-navigation/drawer v7) no funciona si algo se importa antes.
 import 'react-native-gesture-handler';
 
-// Manejador global temporal para capturar el crash y mostrarlo en pantalla.
-// REMOVER antes de producción final.
-import { ErrorUtils } from 'react-native';
-const _prevHandler = ErrorUtils.getGlobalHandler();
-ErrorUtils.setGlobalHandler((error, isFatal) => {
-  alert('[CRASH]\n' + error.message + '\n\n' + (error.stack ?? '').slice(0, 400));
-  _prevHandler(error, isFatal);
-});
-
 import { registerRootComponent } from 'expo';
 
 import App from './App';
