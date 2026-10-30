@@ -3,12 +3,25 @@ import { useWizard } from '../context';
 import { EstadoCarga } from '../../../components/EstadoCarga';
 import { EstadoError } from '../../../components/EstadoError';
 import { EstadoVacio } from '../../../components/EstadoVacio';
-import { hora } from '../../../lib/format';
+import { hora, diasCortos } from '../../../lib/format';
 import type { SlotDisponible } from '../../../types';
 
 interface Props {
   onSiguiente: () => void;
   onAnterior: () => void;
+}
+
+/** Mapea el índice JS del día de semana al valor usado en diasAtencion */
+const DIA_JS: Record<number, string> = {
+  0: 'domingo', 1: 'lunes',   2: 'martes',  3: 'miercoles',
+  4: 'jueves',  5: 'viernes', 6: 'sabado',
+};
+
+/** Devuelve false si la fecha cae fuera de los días de atención de la barbería */
+function esDiaHabil(fecha: string, diasAtencion: string[]): boolean {
+  if (!fecha) return true;
+  const d = new Date(`${fecha}T12:00:00`);
+  return diasAtencion.includes(DIA_JS[d.getDay()]);
 }
 
 /** Devuelve "YYYY-MM-DD" de hoy en zona Colombia */
@@ -31,6 +44,9 @@ export function StepDisponibilidad({ onSiguiente, onAnterior }: Props) {
     fecha: state.fecha,
     duracion: duracionTotal,
   });
+
+  const barberia = state.barberia;
+  const diaHabil = barberia ? esDiaHabil(state.fecha, barberia.diasAtencion) : true;
 
   function seleccionarSlot(slot: SlotDisponible) {
     dispatch({ type: 'SET_SLOT', payload: slot });
@@ -63,8 +79,29 @@ export function StepDisponibilidad({ onSiguiente, onAnterior }: Props) {
         />
       </div>
 
-      {/* Slots */}
-      {state.fecha && (
+      {/* Banner permanente con el horario de la barbería */}
+      {barberia && (
+        <div className="rounded-lg bg-gray-50 border border-gray-200 px-4 py-3 text-sm text-gray-600">
+          <span className="font-medium">Horario de atención: </span>
+          {diasCortos(barberia.diasAtencion)}
+          {' · '}
+          {barberia.horaApertura.slice(0, 5)} – {barberia.horaCierre.slice(0, 5)}
+        </div>
+      )}
+
+      {/* Aviso específico cuando el día seleccionado no es hábil */}
+      {state.fecha && barberia && !diaHabil && (
+        <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+          Este día no está dentro del horario de atención.{' '}
+          <strong>{barberia.nombre}</strong> atiende{' '}
+          <strong>{diasCortos(barberia.diasAtencion)}</strong>, de{' '}
+          <strong>{barberia.horaApertura.slice(0, 5)}</strong> a{' '}
+          <strong>{barberia.horaCierre.slice(0, 5)}</strong>.
+        </div>
+      )}
+
+      {/* Slots — solo se consultan y muestran en días hábiles */}
+      {state.fecha && diaHabil && (
         <section aria-labelledby="titulo-slots">
           <h3 id="titulo-slots" className="font-medium text-gray-700 mb-3 text-sm">
             Horarios disponibles

@@ -1,4 +1,4 @@
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { colors, fontSizes, spacing } from '../../../../core/theme/tokens';
 
 /**
@@ -10,11 +10,12 @@ export const onboardingStyles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: Platform.OS === 'android' ? 25 : 0,
+    // SafeAreaView con edges=['top','bottom'] ya aplica los insets correctos
   },
   scrollContainer: {
     paddingHorizontal: spacing.screen,
-    paddingBottom: 40,
+    paddingBottom: spacing.md,
+    flexGrow: 1,
   },
   titleContainer: {
     marginBottom: spacing.xl,
@@ -44,6 +45,9 @@ export const onboardingStyles = StyleSheet.create({
   footer: {
     width: '100%',
     alignItems: 'center',
+    paddingHorizontal: spacing.screen,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.lg,
   },
   skipButton: {
     paddingVertical: spacing.sm,

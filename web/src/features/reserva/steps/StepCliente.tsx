@@ -36,6 +36,29 @@ export function StepCliente({ onSiguiente }: Props) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   }
 
+  function validarTelefono(v: string) {
+    return /^\d{10}$/.test(v.replace(/\s/g, ''));
+  }
+
+  function validarNombreReal(v: string) {
+    const limpio = v.trim();
+    if (limpio.length < 2) return false;
+    if (!/^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s\-']+$/.test(limpio)) return false;
+    if (/(.)\1{3,}/i.test(limpio.replace(/\s/g, ''))) return false;
+    const solo = limpio.toLowerCase().replace(/[^a-z]/g, '');
+    if (solo.length >= 5) {
+      let seq = 1;
+      for (let i = 1; i < solo.length; i++) {
+        if (solo.charCodeAt(i) === solo.charCodeAt(i - 1) + 1) {
+          if (++seq >= 5) return false;
+        } else {
+          seq = 1;
+        }
+      }
+    }
+    return true;
+  }
+
   function handleBlurCorreo() {
     if (correoInput && validarCorreo(correoInput)) {
       setCorreoConfirmado(correoInput);
@@ -45,7 +68,11 @@ export function StepCliente({ onSiguiente }: Props) {
   function validarFormulario() {
     const e: Record<string, string> = {};
     if (!validarCorreo(correoInput)) e.correo = 'Ingresa un correo electrónico válido.';
-    if (!nombre.trim()) e.nombre = 'El nombre es obligatorio.';
+    if (!validarNombreReal(nombre)) e.nombre = 'Ingresa un nombre real (solo letras, mínimo 2 caracteres).';
+    if (apellido.trim() && !validarNombreReal(apellido))
+      e.apellido = 'El apellido ingresado no es válido (solo letras).';
+    if (telefono.trim() && !validarTelefono(telefono))
+      e.telefono = 'El teléfono debe tener exactamente 10 dígitos numéricos.';
     return e;
   }
 
@@ -156,9 +183,15 @@ export function StepCliente({ onSiguiente }: Props) {
           placeholder="Pérez"
           value={apellido}
           onChange={(e) => setApellido(e.target.value)}
-          className="input"
+          className={`input ${errores.apellido ? 'input-error' : ''}`}
+          aria-describedby={errores.apellido ? 'apellido-error' : undefined}
           readOnly={clienteExistente === true}
         />
+        {errores.apellido && (
+          <p id="apellido-error" className="mt-1 text-xs text-red-600" role="alert">
+            {errores.apellido}
+          </p>
+        )}
       </div>
 
       {/* Teléfono */}
@@ -168,12 +201,18 @@ export function StepCliente({ onSiguiente }: Props) {
           id="telefono"
           type="tel"
           autoComplete="tel"
-          placeholder="300 123 4567"
+          placeholder="3001234567"
           value={telefono}
           onChange={(e) => setTelefono(e.target.value)}
-          className="input"
+          className={`input ${errores.telefono ? 'input-error' : ''}`}
+          aria-describedby={errores.telefono ? 'telefono-error' : undefined}
           readOnly={clienteExistente === true}
         />
+        {errores.telefono && (
+          <p id="telefono-error" className="mt-1 text-xs text-red-600" role="alert">
+            {errores.telefono}
+          </p>
+        )}
       </div>
 
       {clienteExistente === true && (

@@ -90,10 +90,26 @@ async function buscarCliente(req, res) {
 
 const reservaBodySchema = z.object({
   // Datos del cliente
-  nombre: z.string().min(1, 'El nombre es obligatorio.').trim(),
-  apellido: z.string().trim().optional(),
+  nombre: z
+    .string()
+    .min(2, 'El nombre debe tener al menos 2 caracteres.')
+    .max(60, 'El nombre no puede superar los 60 caracteres.')
+    .regex(/^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s\-']+$/, 'El nombre solo puede contener letras.')
+    .trim(),
+  apellido: z
+    .string()
+    .max(60, 'El apellido no puede superar los 60 caracteres.')
+    .regex(/^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s\-']*$/, 'El apellido solo puede contener letras.')
+    .trim()
+    .optional(),
   correo: correoSchema,
-  telefono: z.string().trim().optional(),
+  telefono: z
+    .string()
+    .refine(
+      (v) => /^\d{10}$/.test(v.replace(/\s/g, '')),
+      'El teléfono debe tener exactamente 10 dígitos numéricos.',
+    )
+    .optional(),
   // Si el cliente ya existe, el frontend envía su id para reutilizarlo.
   // Si no, el backend lo crea con los datos anteriores.
   idCliente: z.coerce.number().int().positive().optional(),

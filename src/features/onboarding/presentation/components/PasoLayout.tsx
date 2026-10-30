@@ -56,9 +56,12 @@ export function PasoLayout({ paso, titulo, subtitulo, children, pie }: Props) {
           </View>
 
           <View style={onboardingStyles.formContainer}>{children}</View>
-
-          <View style={onboardingStyles.footer}>{pie}</View>
         </ScrollView>
+
+        {/* Pie fijo fuera del ScrollView: el botón no se mueve cuando el
+            teclado aparece ni cuando los mensajes de error cambian la altura
+            del contenido. */}
+        <View style={onboardingStyles.footer}>{pie}</View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
