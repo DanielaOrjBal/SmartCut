@@ -124,7 +124,9 @@ async function llamarConReintento(cliente, params, timeoutMs) {
   try {
     return await conTimeout(cliente.models.generateContent(params), timeoutMs);
   } catch (primerError) {
-    console.error(`[gemini] Primer intento fallido: ${primerError.constructor.name}. Reintentando…`);
+    console.error(
+      `[gemini] Primer intento fallido: ${primerError.constructor.name}: ${primerError.message ?? '(sin mensaje)'}`,
+    );
     // Sin delay: reintentar de inmediato reduce el tiempo total en caso de fallo transitorio.
     return await conTimeout(cliente.models.generateContent(params), timeoutMs);
   }
